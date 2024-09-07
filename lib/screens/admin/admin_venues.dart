@@ -91,7 +91,7 @@ class _AdminManageVenuesPageState extends State<AdminManageVenuesPage> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.edit),
-                    onPressed: () => updateVenue(index),
+                    onPressed: (){}, //update a venue 
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete),

@@ -32,7 +32,6 @@ class _UpdateVenuePageState extends State<UpdateVenuePage> {
     _availabilityController = TextEditingController(text: widget.venue.availability);
     _suitableForController = TextEditingController(text: widget.venue.suitableFor);
     _additionalDetailsController = TextEditingController(text: widget.venue.additionalDetails);
-    // Convert image paths to XFile objects
     _selectedImages.addAll(widget.venue.images.map((path) => XFile(path)).toList());
   }
 
@@ -66,7 +65,7 @@ class _UpdateVenuePageState extends State<UpdateVenuePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Update Venue'),
+        title: const Text('Update Venue', style: TextStyle(color: Colors.white),),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -76,6 +75,7 @@ class _UpdateVenuePageState extends State<UpdateVenuePage> {
             ),
           ),
         ),
+        automaticallyImplyLeading: true, foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -115,7 +115,7 @@ class _UpdateVenuePageState extends State<UpdateVenuePage> {
             ElevatedButton(
               onPressed: _pickImages,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00008B),
+                backgroundColor: const Color(0xFF5D3FD3),
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
               ),
               child: const Text('Select Images',

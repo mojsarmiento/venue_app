@@ -121,39 +121,6 @@ class BookingDetailsScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32),
-                if (booking['status'] == 'Pending')
-                  ElevatedButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Cancel Booking'),
-                          content: const Text('Are you sure you want to cancel this booking?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context); // Close the dialog
-                              },
-                              child: const Text('No'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                // Implement actual cancellation logic here
-                                Navigator.pop(context); // Close the dialog
-                                Navigator.pop(context); // Go back to the previous page
-                              },
-                              child: const Text('Yes'),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: const Color(0xFF00008B),
-                    ),
-                    child: const Text('Cancel Booking'),
-                  ),
               ],
             ),
           ),
@@ -162,6 +129,7 @@ class BookingDetailsScreen extends StatelessWidget {
     );
   }
 }
+
 
 
 

@@ -47,6 +47,7 @@ class DashboardScreen extends StatelessWidget {
                 subtitle: Text('5'), // Replace with actual data
               ),
             ),
+            SizedBox(height: 16),
             Card(
               elevation: 4,
               child: ListTile(

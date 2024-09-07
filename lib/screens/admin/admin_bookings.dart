@@ -58,15 +58,24 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
           BookingCard(
             name: 'John Doe',
             venueName: 'Venue ABC',
+            location: 'Location ABC',
             date: '2024-08-22',
             time: '15:00',
+            hours: '0',
+            totalPrice: '₱0',
+            downPayment: '₱0',
+            
           ),
           SizedBox(height: 16),
           BookingCard(
             name: 'Jane Smith',
             venueName: 'Venue XYZ',
+            location: 'Location XYZ',
             date: '2024-08-25',
             time: '18:00',
+            hours: '0',
+            totalPrice: '₱0',
+            downPayment: '₱0',
           ),
           // Add more booking cards as needed
         ],
@@ -82,6 +91,7 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
           RequestCard(
             name: 'Alice Johnson',
             venueName: 'Venue A',
+            location: 'Location A',
             date: '2024-08-22',
             time: '10:00 AM',
           ),
@@ -89,6 +99,7 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
           RequestCard(
             name: 'Bob Brown',
             venueName: 'Venue B',
+            location: 'Location B',
             date: '2024-08-25',
             time: '2:00 PM',
           ),
@@ -102,15 +113,23 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
 class BookingCard extends StatelessWidget {
   final String name;
   final String venueName;
+  final String location;
   final String date;
   final String time;
+  final String hours;
+  final String totalPrice;
+  final String downPayment;
 
   const BookingCard({
     super.key,
     required this.name,
     required this.venueName,
+    required this.location,
     required this.date,
     required this.time,
+    required this.hours,
+    required this.totalPrice,
+    required this.downPayment,
   });
 
   @override
@@ -137,12 +156,32 @@ class BookingCard extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
+              'Location: $location',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
               'Date: $date',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
               'Time: $time',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Hours: $hours',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Total Price: $totalPrice',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Downpayment: $downPayment',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 16),
@@ -188,6 +227,7 @@ class BookingCard extends StatelessWidget {
 class RequestCard extends StatelessWidget {
   final String name;
   final String venueName;
+  final String location;
   final String date;
   final String time;
 
@@ -195,6 +235,7 @@ class RequestCard extends StatelessWidget {
     super.key,
     required this.name,
     required this.venueName,
+    required this.location,
     required this.date,
     required this.time,
   });
@@ -219,6 +260,11 @@ class RequestCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Venue: $venueName',
+              style: const TextStyle(fontSize: 16),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Location: $location',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),

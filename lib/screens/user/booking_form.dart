@@ -258,6 +258,15 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                 color: Colors.black87,
               ),
             ),
+            const SizedBox(height: 8),
+            const Text(
+              'Remember no cancellations of bookings!',
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.normal,
+                color: Colors.grey,
+              ),
+            ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: _isPaymentSuccessful
