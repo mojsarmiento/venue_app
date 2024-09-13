@@ -13,11 +13,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  google_fonts: ^4.0.4
+  flutter_rating_bar: ^4.0.0
   # The following adds the Cupertino Icons font to your application.
   cupertino_icons: ^1.0.6
   carousel_slider: ^4.0.0
   image_picker: ^0.8.5+3
+  
 
 dev_dependencies:
   flutter_test:
@@ -44,10 +46,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  #fonts:
+  # - family: Schyler
+  #   fonts:
+  #     - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

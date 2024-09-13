@@ -6,10 +6,10 @@ import 'request_visit_form.dart';
 class VenueDetailsScreen extends StatelessWidget {
   final String name;
   final String location;
-  final List<String> images; // Updated to handle multiple images
+  final List<String> images;
   final String pricePerHour;
   final String availability;
-  final String suitableFor;
+  final String category;
   final String additionalDetails;
 
   const VenueDetailsScreen({
@@ -19,12 +19,14 @@ class VenueDetailsScreen extends StatelessWidget {
     required this.images,
     required this.pricePerHour,
     required this.availability,
-    required this.suitableFor, 
-    required this.additionalDetails
+    required this.category,
+    required this.additionalDetails,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isAvailable = availability.toLowerCase() != 'not available';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -56,7 +58,7 @@ class VenueDetailsScreen extends StatelessWidget {
                 height: 250,
                 autoPlay: true,
                 enlargeCenterPage: true,
-                aspectRatio: 16/9,
+                aspectRatio: 16 / 9,
                 viewportFraction: 0.8,
               ),
               items: images.map((image) {
@@ -65,9 +67,17 @@ class VenueDetailsScreen extends StatelessWidget {
                     return Container(
                       width: MediaQuery.of(context).size.width,
                       margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                      child: Image.asset(
-                        image,
-                        fit: BoxFit.cover,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20), // Adjust radius here
+                        child: Image.asset(
+                          image,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Center(
+                              child: Icon(Icons.error, color: Colors.red),
+                            );
+                          },
+                        ),
                       ),
                     );
                   },
@@ -102,11 +112,14 @@ class VenueDetailsScreen extends StatelessWidget {
             ),
             Text(
               availability,
-              style: const TextStyle(fontSize: 16),
+              style: TextStyle(
+                fontSize: 16,
+                color: isAvailable ? Colors.black87 : Colors.red,
+              ),
             ),
             const SizedBox(height: 16),
             const Text(
-              'Suitable for:',
+              'Category:',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -114,7 +127,7 @@ class VenueDetailsScreen extends StatelessWidget {
               ),
             ),
             Text(
-              suitableFor,
+              category,
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 16),
@@ -147,56 +160,63 @@ class VenueDetailsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const RequestVisitFormScreen(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF5D3FD3),
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-              ),
-              child: const Text(
-                'Request Visit',
-                style: TextStyle(
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BookingFormScreen(
-                      venueName: name,
-                      pricePerHour: pricePerHour,
+            if (isAvailable) ...[
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RequestVisitFormScreen(
+                        venueName: name, location: location,
+                      ),
                     ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF5D3FD3),
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                ),
+                child: const Text(
+                  'Request Visit',
+                  style: TextStyle(
+                    color: Colors.white,
                   ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00008B),
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-              ),
-              child: const Text(
-                'Book Now',
-                style: TextStyle(
-                  color: Colors.white,
                 ),
               ),
-            ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookingFormScreen(
+                        venueName: name,
+                        pricePerHour: pricePerHour,
+                        location: location,
+                      ),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF00008B),
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                ),
+                child: const Text(
+                  'Book Now',
+                  style: TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 }
+
+
 
 
 

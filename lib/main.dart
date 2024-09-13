@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'screens/login.dart'; // Import the LoginScreen from the screens folder
+import 'screens/login.dart';
+import 'package:google_fonts/google_fonts.dart'; 
 
 void main() {
   runApp(const MyApp());
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        textTheme: GoogleFonts.poppinsTextTheme(),
         useMaterial3: true,
       ),
       home: const LoginScreen(),
