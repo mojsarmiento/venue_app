@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'booking_form.dart';
-import 'request_visit_form.dart';
+import 'package:venue_app/screens/user/booking_form.dart';
+import 'package:venue_app/screens/user/request_visit_form.dart';
+import 'package:venue_app/widgets/custom_button2.dart';
 
-class VenueDetailsScreen extends StatelessWidget {
+class VenueDetailsScreen extends StatefulWidget {
   final String name;
   final String location;
   final List<String> images;
@@ -24,16 +24,38 @@ class VenueDetailsScreen extends StatelessWidget {
   });
 
   @override
+  _VenueDetailsScreenState createState() => _VenueDetailsScreenState();
+}
+
+class _VenueDetailsScreenState extends State<VenueDetailsScreen> {
+  final PageController _pageController = PageController();
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController.addListener(() {
+      setState(() {
+        _currentIndex = _pageController.page?.round() ?? 0;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isAvailable = availability.toLowerCase() != 'not available';
+    final isAvailable = widget.availability.toLowerCase() != 'not available';
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(
           'Venue Details',
-          style: TextStyle(
-            color: Colors.white,
-          ),
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -49,44 +71,60 @@ class VenueDetailsScreen extends StatelessWidget {
         automaticallyImplyLeading: true,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
+      body: Container(
+        color: Colors.white, // Background color
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            CarouselSlider(
-              options: CarouselOptions(
-                height: 250,
-                autoPlay: true,
-                enlargeCenterPage: true,
-                aspectRatio: 16 / 9,
-                viewportFraction: 0.8,
-              ),
-              items: images.map((image) {
-                return Builder(
-                  builder: (BuildContext context) {
-                    return Container(
-                      width: MediaQuery.of(context).size.width,
-                      margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20), // Adjust radius here
-                        child: Image.asset(
-                          image,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return const Center(
-                              child: Icon(Icons.error, color: Colors.red),
-                            );
-                          },
-                        ),
+            // Image Carousel
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: widget.images.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final image = widget.images[index];
+                  return Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20),
+                      child: Image.asset(
+                        image,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Icon(Icons.error, color: Colors.red),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 8),
+            // Page Indicator
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(widget.images.length, (index) {
+                return Container(
+                  width: 8.0,
+                  height: 8.0,
+                  margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: (Theme.of(context).brightness == Brightness.dark
+                            ? Colors.white
+                            : Colors.black)
+                        .withOpacity(_currentIndex == index ? 0.9 : 0.4),
+                  ),
                 );
-              }).toList(),
+              }),
             ),
             const SizedBox(height: 16),
+            // Venue Name
             Text(
-              name,
+              widget.name,
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -94,14 +132,16 @@ class VenueDetailsScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
+            // Location
             Text(
-              location,
+              widget.location,
               style: const TextStyle(
                 fontSize: 18,
                 color: Colors.grey,
               ),
             ),
             const SizedBox(height: 16),
+            // Availability
             const Text(
               'Availability:',
               style: TextStyle(
@@ -111,13 +151,14 @@ class VenueDetailsScreen extends StatelessWidget {
               ),
             ),
             Text(
-              availability,
+              widget.availability,
               style: TextStyle(
                 fontSize: 16,
                 color: isAvailable ? Colors.black87 : Colors.red,
               ),
             ),
             const SizedBox(height: 16),
+            // Category
             const Text(
               'Category:',
               style: TextStyle(
@@ -127,10 +168,11 @@ class VenueDetailsScreen extends StatelessWidget {
               ),
             ),
             Text(
-              category,
+              widget.category,
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 16),
+            // Additional Details
             const Text(
               'Additional Details:',
               style: TextStyle(
@@ -140,10 +182,11 @@ class VenueDetailsScreen extends StatelessWidget {
               ),
             ),
             Text(
-              additionalDetails,
+              widget.additionalDetails,
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 16),
+            // Pricing
             const Text(
               'Pricing:',
               style: TextStyle(
@@ -153,60 +196,47 @@ class VenueDetailsScreen extends StatelessWidget {
               ),
             ),
             Text(
-              '₱$pricePerHour per hour',
+              '₱${widget.pricePerHour} per hour',
               style: const TextStyle(
                 fontSize: 16,
                 color: Colors.black87,
               ),
             ),
             const SizedBox(height: 16),
+            // Action Buttons
             if (isAvailable) ...[
-              ElevatedButton(
+              CustomButtonIn(
+                text: 'Request Visit',
+                backgroundColor: const Color(0xFF5D3FD3),
+                textColor: Colors.white,
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => RequestVisitFormScreen(
-                        venueName: name, location: location,
+                        venueName: widget.name, location: widget.location,
                       ),
                     ),
                   );
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF5D3FD3),
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                ),
-                child: const Text(
-                  'Request Visit',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
+              CustomButtonIn(
+                text: 'Book Now',
+                backgroundColor: const Color(0xFF00008B),
+                textColor: Colors.white,
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => BookingFormScreen(
-                        venueName: name,
-                        pricePerHour: pricePerHour,
-                        location: location,
+                        venueName: widget.name,
+                        pricePerHour: widget.pricePerHour,
+                        location: widget.location,
                       ),
                     ),
                   );
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00008B),
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                ),
-                child: const Text(
-                  'Book Now',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
               ),
             ],
           ],
@@ -215,6 +245,10 @@ class VenueDetailsScreen extends StatelessWidget {
     );
   }
 }
+
+
+
+
 
 
 

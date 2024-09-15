@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:venue_app/screens/admin/admin_home.dart';
 import 'package:venue_app/screens/user/home.dart';
 import 'package:venue_app/screens/venue_owner/venue_owner_home.dart';
+import 'package:venue_app/widgets/custom_buttom.dart';
 import 'register.dart';
-import 'forgotpassword.dart';
+import 'forgotpassword.dart'; // Import the custom button
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -144,17 +145,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
+                CustomButton(
+                  text: 'Log In',
                   onPressed: _login,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: const Color(0xFF00008B),
-                    backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: const Text('Log In'),
                 ),
                 const SizedBox(height: 16),
                 TextButton(
@@ -186,6 +179,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
 
 
 

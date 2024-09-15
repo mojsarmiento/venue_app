@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:venue_app/screens/user/requests_page.dart'; // Import the RequestsPage
+import 'package:venue_app/screens/user/requests_page.dart';
+import 'package:venue_app/widgets/custom_button2.dart'; // Import the RequestsPage
 
 class RequestVisitFormScreen extends StatefulWidget {
   final String venueName;
@@ -282,18 +283,9 @@ class _RequestVisitFormScreenState extends State<RequestVisitFormScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: _submitRequest,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF00008B),
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
-                ),
-                child: const Text(
-                  'Submit Request',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
+              CustomButtonIn(
+                text: 'Submit Request', 
+                onPressed: _submitRequest
               ),
             ],
           ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:venue_app/widgets/custom_buttom.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -70,16 +71,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   style: const TextStyle(color: Colors.white),
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _sendResetLink,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: const Color(0xFF00008B), backgroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ), // Button text color (Dark Blue)
+                CustomButton(
+                  text: 'Send Reset Link', 
+                  onPressed: _sendResetLink
                   ),
-                  child: const Text('Send Reset Link'),
-                ),
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {

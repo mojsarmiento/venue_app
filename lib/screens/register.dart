@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:venue_app/widgets/custom_buttom.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -162,18 +163,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   iconEnabledColor: Colors.white,
                 ),
                 const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _register,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: const Color(0xFF00008B),
-                    backgroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ), // Button text color (Dark Blue)
-                  ),
-                  child: const Text('Register'),
-                ),
+                CustomButton(
+                  text: 'Register', 
+                  onPressed: _register),
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {

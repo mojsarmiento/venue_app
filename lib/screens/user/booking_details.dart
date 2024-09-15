@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:venue_app/widgets/custom_button2.dart';
 
 class BookingDetailsScreen extends StatefulWidget {
   final Map<String, String> booking;
 
   const BookingDetailsScreen({
-    Key? key,
+    super.key,
     required this.booking,
-  }) : super(key: key);
+  });
 
   @override
   State<BookingDetailsScreen> createState() => _BookingDetailsScreenState();
@@ -17,6 +18,22 @@ class BookingDetailsScreen extends StatefulWidget {
 class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
   double _userRating = 0.0;
   bool _isRatingSubmitted = false;
+
+  void _handleRatingUpdate(double rating) {
+    setState(() {
+      _userRating = rating;
+    });
+  }
+
+  void _submitRating() {
+    setState(() {
+      _isRatingSubmitted = true;
+    });
+    // Handle rating submission logic here (e.g., send to backend)
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Rating submitted!')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -211,32 +228,18 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                             Icons.star,
                             color: Colors.amber,
                           ),
-                          onRatingUpdate: _isRatingSubmitted
-                              ? (rating) {} // Disable rating bar after submission
-                              : (rating) {
-                                  setState(() {
-                                    _userRating = rating;
-                                  });
-                                },
+                          onRatingUpdate: (rating) {
+                            if (!_isRatingSubmitted) {
+                              _handleRatingUpdate(rating);
+                            }
+                          },
                           ignoreGestures: _isRatingSubmitted, // Prevent further interaction
                         ),
                         const SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: _isRatingSubmitted
-                              ? null
-                              : () {
-                                  setState(() {
-                                    _isRatingSubmitted = true;
-                                  });
-                                  // Handle rating submission logic here (e.g., send to backend)
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Rating submitted!')),
-                                  );
-                                },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF00008B),
-                          ),
-                          child: const Text('Submit Rating', style: TextStyle(color: Colors.white),),
+                        CustomButtonIn(
+                          text: _isRatingSubmitted ? 'Rating Submitted' : 'Submit Rating',
+                          onPressed: _submitRating,
+                          backgroundColor: _isRatingSubmitted ? Colors.grey : const Color(0xFF00008B),
                         ),
                         if (_isRatingSubmitted)
                           const Padding(
@@ -262,6 +265,8 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
     );
   }
 }
+
+
 
 
 

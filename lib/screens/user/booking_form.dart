@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:venue_app/widgets/custom_buttom.dart';
 import 'bookings.dart';
 
 class BookingFormScreen extends StatefulWidget {
@@ -346,13 +347,11 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                 style: const TextStyle(fontSize: 16, color: Colors.black87),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
+              CustomButton(
+                text: _isPaymentSuccessful ? 'Submit Booking' : 'Pay Downpayment',
+                backgroundColor: _isPaymentSuccessful ? const Color(0xFF00008B) : const Color(0xFF5D3FD3),
+                textColor: Colors.white,
                 onPressed: _isPaymentSuccessful ? _submitBooking : _processPayment,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: _isPaymentSuccessful ? const Color(0xFF00008B) : const Color(0xFF5D3FD3),
-                  padding: const EdgeInsets.symmetric(vertical: 16.0),
-                ),
-                child: Text(_isPaymentSuccessful ? 'Submit Booking' : 'Pay Downpayment', style: const TextStyle(color:Colors.white),),
               ),
             ],
           ),
