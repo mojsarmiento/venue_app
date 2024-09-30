@@ -19,12 +19,22 @@ dependencies:
   cupertino_icons: ^1.0.6
   carousel_slider: ^4.0.0
   image_picker: ^0.8.5+3
+  flutter_bloc: ^8.1.0
+  equatable: ^2.0.3 
+  flutter_form_builder: ^7.2.0 
+  http: ^1.2.2 
+  intl: ^0.17.0 
+  json_annotation: ^4.8.0
+  shared_preferences: ^2.0.0
+  
   
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
+  build_runner: ^2.3.3
+  json_serializable: ^6.7.1
 
 flutter:
   uses-material-design: true
@@ -34,6 +44,11 @@ flutter:
     - assets/images/venuetest.jpg
     - assets/images/profile_pic.jpg
     - assets/images/venue_vista_logo.png
+    - assets/images/venuevista_intro.png
+    - assets/images/browse_venue.png
+    - assets/images/book_venue.png
+    - assets/images/manage_book.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

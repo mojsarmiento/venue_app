@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:venue_app/screens/login.dart';
+import 'package:venue_app/screens/user/be_a_venueowner.dart';
 import 'package:venue_app/screens/user/change_password.dart';
 import 'package:venue_app/screens/user/edit_profile.dart';
 
@@ -14,9 +15,9 @@ class ProfilePage extends StatelessWidget {
         title: const Text(
           'Profile',
           style: TextStyle(
-            color:Color(0xFF00008B) ,
-            fontSize: 24,
-            fontWeight: FontWeight.bold),
+              color: Color(0xFF00008B),
+              fontSize: 24,
+              fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.white,
         automaticallyImplyLeading: false,
@@ -68,11 +69,19 @@ class ProfilePage extends StatelessWidget {
               },
             ),
             ListTile(
+              leading: const Icon(Icons.business, color: Color(0xFF00008B)), // Use an appropriate icon
+              title: const Text('Be a Venue Owner'),
+              trailing: const Icon(Icons.arrow_forward_ios),
+              onTap: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const BeAVenueOwnerPage()));
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.exit_to_app, color: Color(0xFF00008B)),
               title: const Text('Logout'),
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+                Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
               },
             ),
             const SizedBox(height: 30),
@@ -101,3 +110,4 @@ class ProfilePage extends StatelessWidget {
     );
   }
 }
+

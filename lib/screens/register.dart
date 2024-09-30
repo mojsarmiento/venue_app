@@ -15,15 +15,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
-  String? _selectedUserType;
-
   void _register() {
     // Implement your registration logic here
     print('Full Name: ${_fullNameController.text}');
     print('Email: ${_emailController.text}');
     print('Password: ${_passwordController.text}');
     print('Confirm Password: ${_confirmPasswordController.text}');
-    print('User Type: $_selectedUserType');
   }
 
   @override
@@ -132,40 +129,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   obscureText: true,
                   style: const TextStyle(color: Colors.white),
                 ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: _selectedUserType,
-                  items: ['Reserver', 'Venue Owner'].map((String type) {
-                    return DropdownMenuItem<String>(
-                      value: type,
-                      child: Text(type),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedUserType = newValue;
-                    });
-                  },
-                  decoration: const InputDecoration(
-                    labelText: 'User Type',
-                    labelStyle: TextStyle(color: Colors.white),
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.person_outline, color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                  ),
-                  style: const TextStyle(color: Colors.white),
-                  dropdownColor: Color(0xFF00008B),
-                  iconEnabledColor: Colors.white,
-                ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 24), // Adjusted spacing
                 CustomButton(
-                  text: 'Register', 
-                  onPressed: _register),
+                  text: 'Register',
+                  onPressed: _register,
+                ),
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
@@ -182,3 +150,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 }
+

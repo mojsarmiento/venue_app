@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:venue_app/screens/admin/admin_home.dart';
 import 'package:venue_app/screens/user/home.dart';
-import 'package:venue_app/screens/venue_owner/venue_owner_home.dart';
 import 'package:venue_app/widgets/custom_buttom.dart';
 import 'register.dart';
 import 'forgotpassword.dart'; // Import the custom button
@@ -17,25 +15,13 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  String _selectedUserType = 'Reserver'; // Default user type
 
   void _login() {
-    if (_selectedUserType == 'Venue Owner') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const VenueOwnerScreen()),
-      );
-    } else if (_selectedUserType == 'Admin') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const AdminScreen()),
-      );
-    } else {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    }
+    // Default navigation, adjust as necessary
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
+    );
   }
 
   @override
@@ -63,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: 150,
                   alignment: Alignment.center,
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20), // Adjusted spacing
                 const Text(
                   'Welcome Back',
                   style: TextStyle(
@@ -79,36 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(fontSize: 16, color: Colors.white70),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40),
-                DropdownButtonFormField<String>(
-                  value: _selectedUserType,
-                  dropdownColor: const Color(0xFF00008B),
-                  decoration: const InputDecoration(
-                    labelText: 'Select User Type',
-                    labelStyle: TextStyle(color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                  ),
-                  icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-                  style: const TextStyle(color: Colors.white),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      _selectedUserType = newValue!;
-                    });
-                  },
-                  items: <String>['Reserver', 'Venue Owner', 'Admin']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 40), // Adjusted spacing
                 TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(
@@ -179,6 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
 
 
 

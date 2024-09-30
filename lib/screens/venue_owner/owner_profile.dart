@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:venue_app/screens/login.dart';
+import 'package:venue_app/screens/user/home.dart';
 import 'package:venue_app/screens/venue_owner/owner_change_password.dart';
 import 'package:venue_app/screens/venue_owner/owner_edit_profile.dart';
 
@@ -13,7 +14,7 @@ class VenueOwnerProfilePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Profile', 
         style: TextStyle(
-          color:Color(0xFF00008B),
+          color: Color(0xFF00008B),
           fontSize: 24,
           fontWeight: FontWeight.bold),
         ),
@@ -94,9 +95,35 @@ class VenueOwnerProfilePage extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 30),
+            ElevatedButton(
+              onPressed: () {
+                // Navigate to Reserver Home Page
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HomeScreen()), // Ensure this is the correct import
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF00008B),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+              ),
+              child: const Text(
+                'Be a Reserver',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+
