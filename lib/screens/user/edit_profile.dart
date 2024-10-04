@@ -1,53 +1,16 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 
 class EditProfilePage extends StatefulWidget {
-  final String initialName;
-  final String initialEmail;
-
-  const EditProfilePage({super.key, required this.initialName, required this.initialEmail});
+  const EditProfilePage({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _EditProfilePageState createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
-  final _formKey = GlobalKey<FormState>();
-  late String _name;
-  late String _email;
-
-  @override
-  void initState() {
-    super.initState();
-    _name = widget.initialName;
-    _email = widget.initialEmail;
-  }
-
-  Future<void> updateProfile() async {
-  final response = await http.post(
-    Uri.parse('http://10.0.2.2/database/update_profile.php'),
-    headers: <String, String>{
-      'Content-Type': 'application/json; charset=UTF-8',
-    },
-    body: jsonEncode(<String, String>{
-      'full_name': _name,
-      'email': _email,
-    }),
-  );
-
-  if (response.statusCode == 200) {
-    final data = json.decode(response.body);
-    if (data['success']) {
-      Navigator.pop(context); // Go back to the previous page
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(data['message'])));
-    }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to update profile')));
-  }
-}
-
+  final _nameController = TextEditingController(text: 'Kobe Roca');
+  final _emailController = TextEditingController(text: 'koberoca@gmail.com');
 
   @override
   Widget build(BuildContext context) {
@@ -73,58 +36,49 @@ class _EditProfilePageState extends State<EditProfilePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
+        child: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-              TextFormField(
-                initialValue: _name,
+              CircleAvatar(
+                radius: 60,
+                backgroundImage: const AssetImage('assets/images/profile_pic.jpg'),
+                backgroundColor: Colors.transparent,
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: IconButton(
+                    icon: const Icon(Icons.camera_alt, color: Color(0xFF00008B)),
+                    onPressed: () {
+                      // Implement image picker functionality
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: _nameController,
                 decoration: const InputDecoration(
-                  labelText: 'Name',
+                  labelText: 'Full Name',
                   labelStyle: TextStyle(color: Color(0xFF00008B)),
                   border: OutlineInputBorder(),
                 ),
                 style: const TextStyle(color: Colors.black),
-                onSaved: (value) {
-                  _name = value!;
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 16),
-              TextFormField(
-                initialValue: _email,
+              TextField(
+                controller: _emailController,
                 decoration: const InputDecoration(
                   labelText: 'Email',
                   labelStyle: TextStyle(color: Color(0xFF00008B)),
                   border: OutlineInputBorder(),
                 ),
                 style: const TextStyle(color: Colors.black),
-                onSaved: (value) {
-                  _email = value!;
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  } else if (!RegExp(r'^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z]+').hasMatch(value)) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                },
               ),
               const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    _formKey.currentState!.save();
-                    updateProfile(); // Call the update profile function
-                  }
+                  // Implement save functionality
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF00008B),
@@ -148,4 +102,3 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 }
-

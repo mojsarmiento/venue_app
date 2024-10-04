@@ -7,13 +7,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final ApiService apiService;
 
   LoginBloc({required this.apiService}) : super(LoginInitial()) {
-    // Listen for events and respond accordingly
     on<LoginButtonPressed>((event, emit) async {
       emit(LoginLoading());
       try {
         final response = await apiService.login(event.email, event.password);
         if (response.isSuccess) {
-          emit(LoginSuccess(userType: response.userType)); // Pass userType
+          emit(LoginSuccess(email: event.email, userType: response.userType));
         } else {
           emit(LoginFailure(error: response.message ?? 'Login failed'));
         }
