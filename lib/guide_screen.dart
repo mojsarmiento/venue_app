@@ -40,7 +40,7 @@ class _GuideScreenState extends State<GuideScreen> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Image.asset(image, height: 500), // Adjust image height as necessary
+        Image.asset(image, height: 300), // Adjust image height as necessary
         const SizedBox(height: 20),
         Text(
           title,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:venue_app/widgets/custom_buttom.dart';
+import 'package:venue_app/widgets/custom_button.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});

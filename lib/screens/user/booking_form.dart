@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:venue_app/widgets/custom_buttom.dart';
+import 'package:venue_app/widgets/custom_button.dart';
 import 'bookings.dart';
 
 class BookingFormScreen extends StatefulWidget {

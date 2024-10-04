@@ -1,11 +1,15 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:venue_app/models/venue.dart';
+import 'package:venue_app/screens/venue_owner/manage.dart';
 
 class AddVenuePage extends StatefulWidget {
-  const AddVenuePage({super.key});
+  final List<Venue> venues; 
+  const AddVenuePage({super.key, required this.venues});
 
   @override
+  // ignore: library_private_types_in_public_api
   _AddVenuePageState createState() => _AddVenuePageState();
 }
 
@@ -31,30 +35,43 @@ class _AddVenuePageState extends State<AddVenuePage> {
     });
     }
 
-  void _addVenue() {
-    if (_formKey.currentState?.validate() ?? false) {
-      setState(() {
-        _venues.add(
-          Venue(
-            name: _nameController.text,
-            location: _locationController.text,
-            images: _images.map((file) => file.path).toList(),
-            pricePerHour: double.parse(_pricePerHourController.text),
-            availability: _availabilityController.text,
-            suitableFor: _suitableForController.text,
-            additionalDetails: _additionalDetailsController.text,
-          ),
-        );
-        _nameController.clear();
-        _locationController.clear();
-        _pricePerHourController.clear();
-        _availabilityController.clear();
-        _suitableForController.clear();
-        _additionalDetailsController.clear();
-        _images.clear();
-      });
-    }
+ void _addVenue() {
+  if (_formKey.currentState?.validate() ?? false) {
+    setState(() {
+      _venues.add(
+        Venue(
+          name: _nameController.text,
+          location: _locationController.text,
+          images: _images.map((file) => file.path).toList(),
+          pricePerHour: double.parse(_pricePerHourController.text),
+          availability: _availabilityController.text,
+          suitableFor: _suitableForController.text,
+          additionalDetails: _additionalDetailsController.text,
+        ),
+      );
+
+      // Clear fields after adding
+      _nameController.clear();
+      _locationController.clear();
+      _pricePerHourController.clear();
+      _availabilityController.clear();
+      _suitableForController.clear();
+      _additionalDetailsController.clear();
+      _images.clear();
+    });
+
+    // Navigate to ManageVenuesPage with the updated list of venues
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ManageVenuesPage(
+          venues: _venues,
+        ),
+      ),
+    );
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -157,26 +174,6 @@ class _AddVenuePageState extends State<AddVenuePage> {
       ),
     );
   }
-}
-
-class Venue {
-  Venue({
-    required this.name,
-    required this.location,
-    required this.images,
-    required this.pricePerHour,
-    required this.availability,
-    required this.suitableFor,
-    required this.additionalDetails,
-  });
-
-  String name;
-  String location;
-  List<String> images; // Updated to handle a list of image paths
-  double pricePerHour;
-  String availability;
-  String suitableFor;
-  String additionalDetails;
 }
 
 

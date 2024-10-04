@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:venue_app/models/venue.dart';
 
 class UpdateVenuePage extends StatefulWidget {
   final Venue venue;
@@ -156,24 +157,3 @@ class _UpdateVenuePageState extends State<UpdateVenuePage> {
     );
   }
 }
-
-class Venue {
-  Venue({
-    required this.name,
-    required this.location,
-    required this.images,
-    required this.pricePerHour,
-    required this.availability,
-    required this.suitableFor,
-    required this.additionalDetails,
-  });
-
-  String name;
-  String location;
-  List<String> images;
-  double pricePerHour;
-  String availability;
-  String suitableFor;
-  String additionalDetails;
-}
-

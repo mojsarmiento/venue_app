@@ -1,26 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:venue_app/screens/user/home.dart';
-import 'package:venue_app/widgets/custom_buttom.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:venue_app/bloc/login_bloc.dart';
+import 'package:venue_app/bloc/login_event.dart';
+import 'package:venue_app/bloc/login_state.dart';
+import 'package:venue_app/screens/user/home.dart'; // Adjust this import based on your file structure
+import 'package:venue_app/widgets/custom_button.dart';
 import 'register.dart';
-import 'forgotpassword.dart'; // Import the custom button
+import 'forgotpassword.dart';
+import 'package:venue_app/services/api_service.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _LoginScreenState createState() => _LoginScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => LoginBloc(apiService: ApiService()),
+      child: const LoginScreenBody(),
+    );
+  }
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class LoginScreenBody extends StatefulWidget {
+  const LoginScreenBody({super.key});
+
+  @override
+  LoginScreenBodyState createState() => LoginScreenBodyState();
+}
+
+class LoginScreenBodyState extends State<LoginScreenBody> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  
+  // New boolean variable to manage password visibility
+  bool _isPasswordVisible = false;
 
-  void _login() {
-    // Default navigation, adjust as necessary
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
+  Future<void> _login() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Email and password cannot be empty.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    BlocProvider.of<LoginBloc>(context).add(
+      LoginButtonPressed(email: email, password: password),
     );
   }
 
@@ -40,95 +71,156 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 30),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Image.asset(
-                  'assets/images/venue_vista_logo.png',
-                  height: 150,
-                  width: 150,
-                  alignment: Alignment.center,
-                ),
-                const SizedBox(height: 20), // Adjusted spacing
-                const Text(
-                  'Welcome Back',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Log in to continue',
-                  style: TextStyle(fontSize: 16, color: Colors.white70),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 40), // Adjusted spacing
-                TextField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    labelStyle: TextStyle(color: Colors.white),
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.email, color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                  ),
-                  keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: Colors.white),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _passwordController,
-                  decoration: const InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: TextStyle(color: Colors.white),
-                    border: OutlineInputBorder(),
-                    prefixIcon: Icon(Icons.lock, color: Colors.white),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.white),
-                    ),
-                  ),
-                  obscureText: true,
-                  style: const TextStyle(color: Colors.white),
-                ),
-                const SizedBox(height: 24),
-                CustomButton(
-                  text: 'Log In',
-                  onPressed: _login,
-                ),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ForgotPasswordScreen()),
+            child: BlocConsumer<LoginBloc, LoginState>(
+              listener: (context, state) async {
+                if (state is LoginSuccess) {
+                  // Check if the widget is still mounted before using the context
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Reserver Login Successfully'),
+                        backgroundColor: Colors.green,
+                      ),
                     );
-                  },
-                  style: TextButton.styleFrom(foregroundColor: Colors.white),
-                  child: const Text('Forgot Password?'),
-                ),
-                const SizedBox(height: 5),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
+
+                    // Store userType in SharedPreferences
+                    final SharedPreferences prefs = await SharedPreferences.getInstance();
+                    await prefs.setString('userType', state.userType ?? '');
+
+                    Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (context) => const RegisterScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const HomeScreen(), // Navigate to HomeScreen for all users
+                      ),
                     );
-                  },
-                  style: TextButton.styleFrom(foregroundColor: Colors.white),
-                  child: const Text('Register Now'),
-                ),
-              ],
+                  }
+                } else if (state is LoginFailure) {
+                  // Check if the widget is still mounted before using the context
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          state.error.contains('password')
+                              ? 'Wrong Password'
+                              : 'Login failed: ${state.error}',
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+              builder: (context, state) {
+                if (state is LoginLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Image.asset(
+                      'assets/images/venue_vista_logo.png',
+                      height: 150,
+                      width: 150,
+                      alignment: Alignment.center,
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Welcome Back',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Log in to continue',
+                      style: TextStyle(fontSize: 16, color: Colors.white70),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 40),
+                    TextField(
+                      controller: _emailController,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        labelStyle: TextStyle(color: Colors.white),
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.email, color: Colors.white),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: _passwordController,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: const TextStyle(color: Colors.white),
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.lock, color: Colors.white),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                            color: Colors.white,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
+                        enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                      ),
+                      obscureText: !_isPasswordVisible,
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                    const SizedBox(height: 24),
+                    CustomButton(
+                      text: 'Log In',
+                      onPressed: _login,
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ForgotPasswordScreen(),
+                          ),
+                        );
+                      },
+                      style: TextButton.styleFrom(foregroundColor: Colors.white),
+                      child: const Text('Forgot Password?'),
+                    ),
+                    const SizedBox(height: 5),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterScreen(),
+                          ),
+                        );
+                      },
+                      style: TextButton.styleFrom(foregroundColor: Colors.white),
+                      child: const Text('Register Now'),
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),
@@ -136,6 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
 
 
 

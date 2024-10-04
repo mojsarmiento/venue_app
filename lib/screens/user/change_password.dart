@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class ChangePasswordPage extends StatefulWidget {
-  const ChangePasswordPage({super.key});
+  final String userId; // Add userId parameter
+
+  const ChangePasswordPage({super.key, required this.userId}); // Update constructor
 
   @override
-  // ignore: library_private_types_in_public_api
   _ChangePasswordPageState createState() => _ChangePasswordPageState();
 }
 
@@ -13,6 +16,38 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  Future<void> changePassword() async {
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2/database/change_password.php'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'user_id': widget.userId, // Use dynamic userId
+        'current_password': _currentPasswordController.text,
+        'new_password': _newPasswordController.text,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['success']) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Password changed successfully')),
+        );
+        Navigator.pop(context); // Navigate back to the previous page
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'])), // Display error message
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error changing password')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -101,11 +136,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState?.validate() ?? false) {
-                    // Implement the change password functionality
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Password changed successfully')),
-                    );
-                    Navigator.pop(context); // Navigate back to the previous page
+                    changePassword(); // Call the change password function
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -130,3 +161,5 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 }
+
+
