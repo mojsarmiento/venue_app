@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Add this import
 import 'package:venue_app/bloc/register_bloc.dart';
 import 'package:venue_app/bloc/register_event.dart';
 import 'package:venue_app/bloc/register_state.dart';
@@ -43,7 +44,7 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
         password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
   }
 
-  void _register() {
+  void _register() async {
     if (_fullNameController.text.trim().isEmpty &&
         _emailController.text.trim().isEmpty &&
         _passwordController.text.trim().isEmpty &&
@@ -172,8 +173,7 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
           fullName: fullName,
           email: _emailController.text,
           password: _passwordController.text,
-        ),
-      );
+        ));
     } else {
       // Show alert dialog for password mismatch
       showDialog(
@@ -200,10 +200,15 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: BlocListener<RegisterBloc, RegisterState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is RegisterLoading) {
             // Optionally, you could show a loading indicator here.
           } else if (state is RegisterSuccess) {
+            // Store full name and email in SharedPreferences
+            final SharedPreferences prefs = await SharedPreferences.getInstance();
+            await prefs.setString('full_name', _fullNameController.text.trim());
+            await prefs.setString('email', _emailController.text.trim());
+
             // Show success Snackbar
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Registration Successful')),
@@ -282,12 +287,12 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
                         borderSide: BorderSide(color: Colors.white),
                       ),
                     ),
-                    keyboardType: TextInputType.emailAddress,
                     style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _passwordController,
+                    obscureText: !_isPasswordVisible,
                     decoration: InputDecoration(
                       labelText: 'Password',
                       labelStyle: const TextStyle(color: Colors.white),
@@ -313,12 +318,12 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
                         borderSide: BorderSide(color: Colors.white),
                       ),
                     ),
-                    obscureText: !_isPasswordVisible,
                     style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 16),
                   TextField(
                     controller: _confirmPasswordController,
+                    obscureText: !_isConfirmPasswordVisible,
                     decoration: InputDecoration(
                       labelText: 'Confirm Password',
                       labelStyle: const TextStyle(color: Colors.white),
@@ -344,15 +349,16 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
                         borderSide: BorderSide(color: Colors.white),
                       ),
                     ),
-                    obscureText: !_isConfirmPasswordVisible,
                     style: const TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 32),
                   CustomButton(
-                    onPressed: _register,
                     text: 'Register',
+                    onPressed: _register,
+                    backgroundColor: Colors.white,
+                    textColor: const Color.fromARGB(255, 93, 19, 177),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 32),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -362,7 +368,7 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
                       ),
                       TextButton(
                         onPressed: () {
-                          Navigator.pop(context); // Go back to login screen
+                          Navigator.pop(context); // Navigate back to the login page
                         },
                         child: const Text(
                           'Login',
@@ -380,5 +386,4 @@ class _RegisterScreenBodyState extends State<_RegisterScreenBody> {
     );
   }
 }
-
 

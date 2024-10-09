@@ -22,7 +22,7 @@ class _AdminScreenState extends State<AdminScreen> {
     const ManageBookingsPage(),
     const ManageUsersPage(),
     const AdminManageVenuesPage(),
-    const AdminProfilePage(),
+    const AdminProfilePage(fullName: '', email: '',),
   ];
 
   void _onItemTapped(int index) {

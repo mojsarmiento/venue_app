@@ -4,7 +4,7 @@ import 'package:venue_app/screens/admin/admin_edit_profile.dart';
 import 'package:venue_app/screens/login.dart';
 
 class AdminProfilePage extends StatelessWidget {
-  const AdminProfilePage({super.key});
+  const AdminProfilePage({super.key, required String fullName, required String email});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class AdminProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             const Text(
-              'Kobe Roca',
+              'Venue Vista',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -43,21 +43,13 @@ class AdminProfilePage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             const Text(
-              'koberoca@gmail.com',
+              'venuevistaadmin@gmail.com',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
               ),
             ),
             const SizedBox(height: 30),
-            ListTile(
-              leading: const Icon(Icons.edit, color: Color(0xFF00008B)),
-              title: const Text('Edit Profile'),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const AdminEditProfilePage()));
-              },
-            ),
             ListTile(
               leading: const Icon(Icons.lock, color: Color(0xFF00008B)),
               title: const Text('Change Password'),
@@ -75,25 +67,6 @@ class AdminProfilePage extends StatelessWidget {
               },
             ),
             const SizedBox(height: 30),
-            ElevatedButton(
-              onPressed: () {
-                // Implement the function to save or update profile
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00008B),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-              ),
-              child: const Text(
-                'Save Changes',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
-                ),
-              ),
-            ),
           ],
         ),
       ),

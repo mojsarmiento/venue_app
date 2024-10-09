@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:venue_app/bloc/login_bloc.dart'; // Import your LoginBloc
-import 'package:venue_app/bloc/login_event.dart'; // Import LoginEvent
-import 'package:venue_app/bloc/login_state.dart'; // Import LoginState
-import 'package:venue_app/services/api_service.dart'; // Import your ApiService
-import 'package:venue_app/screens/admin/admin_home.dart'; // Corrected import for AdminScreen
-import 'package:venue_app/screens/user/home.dart'; // Adjust this import based on your file structure
+import 'package:venue_app/bloc/login_bloc.dart';
+import 'package:venue_app/bloc/login_event.dart';
+import 'package:venue_app/bloc/login_state.dart';
+import 'package:venue_app/services/api_service.dart';
+import 'package:venue_app/screens/admin/admin_home.dart';
+import 'package:venue_app/screens/user/home.dart';
 import 'package:venue_app/widgets/custom_button.dart';
 import 'register.dart';
 import 'forgotpassword.dart';
@@ -33,15 +33,12 @@ class LoginScreenBody extends StatefulWidget {
 class LoginScreenBodyState extends State<LoginScreenBody> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  // Password visibility toggle
   bool _isPasswordVisible = false;
 
   Future<void> _login() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    // Validate email and password fields
     if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -76,52 +73,41 @@ class LoginScreenBodyState extends State<LoginScreenBody> {
             child: BlocConsumer<LoginBloc, LoginState>(
               listener: (context, state) async {
                 if (state is LoginSuccess) {
-                  // Store user email and userType in SharedPreferences
                   final SharedPreferences prefs = await SharedPreferences.getInstance();
-                  await prefs.setString('email', state.email);
-                  await prefs.setString('userType', state.userType ?? '');
+                  
+                  // Save user information in SharedPreferences
+                  await prefs.setString('email', state.email); // Save email
+                  await prefs.setString('full_name', state.full_name); // Save full name
+                  await prefs.setString('userType', state.userType ?? ''); // Save user type
 
-                  // Show success message based on user type
-                  String successMessage;
-                  if (state.userType == 'admin') {
-                    successMessage = 'Admin Login Successful';
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const AdminScreen()),
-                    );
-                  } else if (state.userType == 'reserver') {
-                    successMessage = 'Reserver Login Successful';
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomeScreen()),
-                    );
-                  } else {
-                    successMessage = 'Login Successful';
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  // Navigate to the appropriate screen
+                  if (mounted) {
+                    Widget nextScreen = state.userType == 'admin' ? const AdminScreen() : const HomeScreen();
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => nextScreen));
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          state.userType == 'admin' ? 'Admin Login Successful' : 'Reserver Login Successful',
+                        ),
+                        backgroundColor: Colors.green,
+                      ),
                     );
                   }
-
-                  // Display the success message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(successMessage),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
                 } else if (state is LoginFailure) {
-                  // Show error message
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        state.error.contains('password')
-                            ? 'Wrong Password'
-                            : 'Login failed: ${state.error}',
+                  // Ensure context is valid
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          state.error.contains('password')
+                              ? 'Wrong Password'
+                              : 'Login failed: ${state.error}',
+                        ),
+                        backgroundColor: Colors.red,
                       ),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
+                    );
+                  }
                 }
               },
               builder: (context, state) {
@@ -242,8 +228,6 @@ class LoginScreenBodyState extends State<LoginScreenBody> {
     );
   }
 }
-
-
 
 
 
