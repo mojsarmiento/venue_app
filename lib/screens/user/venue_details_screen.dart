@@ -7,10 +7,11 @@ class VenueDetailsScreen extends StatefulWidget {
   final String name;
   final String location;
   final List<String> images;
-  final String pricePerHour;
+  final double pricePerHour;
   final String availability;
   final String category;
   final String additionalDetails;
+  
 
   const VenueDetailsScreen({
     super.key,
@@ -196,10 +197,11 @@ class _VenueDetailsScreenState extends State<VenueDetailsScreen> {
               ),
             ),
             Text(
-              '₱${widget.pricePerHour} per hour',
-              style: const TextStyle(
+                '₱${widget.pricePerHour.toStringAsFixed(2)} per hour',
+                style: const TextStyle(
+                fontFamily: 'Poppins',  // Ensure 'Poppins' is used
                 fontSize: 16,
-                color: Colors.black87,
+                color: Color(0xFF00008B),
               ),
             ),
             const SizedBox(height: 16),
@@ -232,7 +234,7 @@ class _VenueDetailsScreenState extends State<VenueDetailsScreen> {
                       builder: (context) => BookingFormScreen(
                         venueName: widget.name,
                         pricePerHour: widget.pricePerHour,
-                        location: widget.location,
+                        location: widget.location, 
                       ),
                     ),
                   );

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:venue_app/screens/admin/admin_change_password.dart';
-import 'package:venue_app/screens/admin/admin_edit_profile.dart';
 import 'package:venue_app/screens/login.dart';
 
 class AdminProfilePage extends StatelessWidget {

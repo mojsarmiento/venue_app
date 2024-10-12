@@ -6,6 +6,7 @@ import 'package:venue_app/bloc/login_state.dart';
 import 'package:venue_app/services/api_service.dart';
 import 'package:venue_app/screens/admin/admin_home.dart';
 import 'package:venue_app/screens/user/home.dart';
+import 'package:venue_app/screens/venue_owner/venue_owner_home.dart'; // Import the Venue Owner Screen
 import 'package:venue_app/widgets/custom_button.dart';
 import 'register.dart';
 import 'forgotpassword.dart';
@@ -82,13 +83,26 @@ class LoginScreenBodyState extends State<LoginScreenBody> {
 
                   // Navigate to the appropriate screen
                   if (mounted) {
-                    Widget nextScreen = state.userType == 'admin' ? const AdminScreen() : const HomeScreen();
+                    Widget nextScreen;
+
+                    if (state.userType == 'admin') {
+                      nextScreen = const AdminScreen();
+                    } else if (state.userType == 'venue_owner') {
+                      nextScreen = const VenueOwnerScreen(); // Navigate to Venue Owner
+                    } else {
+                      nextScreen = const HomeScreen(); // Default to Reserver Home
+                    }
+
                     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => nextScreen));
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(
-                          state.userType == 'admin' ? 'Admin Login Successful' : 'Reserver Login Successful',
+                          state.userType == 'admin'
+                              ? 'Admin Login Successful'
+                              : state.userType == 'venue_owner'
+                                  ? 'Venue Owner Login Successful'
+                                  : 'Reserver Login Successful',
                         ),
                         backgroundColor: Colors.green,
                       ),

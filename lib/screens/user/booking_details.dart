@@ -8,7 +8,7 @@ class BookingDetailsScreen extends StatefulWidget {
 
   const BookingDetailsScreen({
     super.key,
-    required this.booking,
+    required this.booking, required Map<String, String> bookingDetails,
   });
 
   @override

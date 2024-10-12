@@ -5,7 +5,7 @@ import 'bookings.dart';
 class BookingFormScreen extends StatefulWidget {
   final String venueName;
   final String location;
-  final String pricePerHour;
+  final double pricePerHour;
 
   const BookingFormScreen({
     super.key,
@@ -35,7 +35,11 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
 
   void _calculatePrice() {
     double hours = double.tryParse(_hoursController.text) ?? 0.0;
-    double pricePerHour = double.tryParse(widget.pricePerHour) ?? 0.0;
+    // ignore: unnecessary_type_check
+    double pricePerHour = widget.pricePerHour is double
+    ? widget.pricePerHour
+    : double.tryParse(widget.pricePerHour.toString()) ?? 0.0;
+
     setState(() {
       _totalPrice = hours * pricePerHour;
       _downpayment = _totalPrice * 0.5;
@@ -77,7 +81,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => BookingsPage(newBooking: booking),
+                  builder: (context) => BookingsPage(newBooking: booking, bookings: const [],),
                 ),
               );
             },
@@ -142,7 +146,10 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
               ),
               Text(
                 'Price: ₱${widget.pricePerHour} per hour',
-                style: const TextStyle(fontSize: 16, color: Colors.black87),
+                style: const TextStyle(
+                  fontSize: 16, 
+                  fontFamily: 'Poppins',
+                  color: Colors.black87),
               ),
               const SizedBox(height: 16),
               const Text(

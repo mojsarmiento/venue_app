@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final List<Widget> _widgetOptions = <Widget>[
     const VenueCatalogScreen(),
-    const BookingsPage(),
+    const BookingsPage(newBooking: {}, bookings: [],),
     const RequestsPage(),
     const ProfilePage(),
   ];

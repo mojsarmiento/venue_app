@@ -4,10 +4,9 @@ import 'package:venue_app/screens/user/booking_details.dart';
 class BookingsPage extends StatefulWidget {
   final Map<String, String>? newBooking;
 
-  const BookingsPage({super.key, this.newBooking});
+  const BookingsPage({super.key, this.newBooking, required List bookings});
 
   @override
-  // ignore: library_private_types_in_public_api
   _BookingsPageState createState() => _BookingsPageState();
 }
 
@@ -17,44 +16,11 @@ class _BookingsPageState extends State<BookingsPage> {
   @override
   void initState() {
     super.initState();
-    // Initialize with some default bookings if needed
-    _bookings.addAll([
-      {
-        'venue': 'Venue 1',
-        'location': 'Location A',
-        'date': 'Aug 20, 2024',
-        'time': '10:00 AM - 12:00 PM',
-        'status': 'Confirmed',
-        'totalPrice': '₱2000',
-        'downpayment': '₱1000',
-        'hours': '2',
-      },
-      {
-        'venue': 'Venue 2',
-        'location': 'Location B',
-        'date': 'Aug 21, 2024',
-        'time': '1:00 PM - 3:00 PM',
-        'status': 'Pending',
-        'totalPrice': '₱3000',
-        'downpayment': '₱1500',
-        'hours': '2',
-      },
-      {
-        'venue': 'Venue 3',
-        'location': 'Location C',
-        'date': 'Aug 22, 2024',
-        'time': '2:00 PM - 4:00 PM',
-        'status': 'Cancelled',
-        'totalPrice': '₱0',
-        'downpayment': '₱0',
-        'hours': '0',
-      },
-    ]);
-
-    // Add the new booking if it exists
+    // Initialize bookings if newBooking exists
     if (widget.newBooking != null) {
       _bookings.add(widget.newBooking!);
     }
+    // TODO: Fetch the bookings from your API and add them to _bookings here.
   }
 
   Future<bool> _confirmDelete() async {
@@ -120,7 +86,7 @@ class _BookingsPageState extends State<BookingsPage> {
                   final canDelete = booking['status'] != 'Pending';
 
                   return Dismissible(
-                    key: Key(booking['venue']!),
+                    key: Key(booking['venue'] ?? ''), // Unique key for dismissible
                     direction: canDelete
                         ? DismissDirection.endToStart
                         : DismissDirection.none, // Disable swipe for pending bookings
@@ -139,7 +105,7 @@ class _BookingsPageState extends State<BookingsPage> {
                       // Show SnackBar with "Undo" option
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text("${deletedBooking['venue']} booking deleted"),
+                          content: Text("${deletedBooking['venue'] ?? ''} booking deleted"),
                           action: SnackBarAction(
                             label: "Undo",
                             onPressed: () {
@@ -169,7 +135,8 @@ class _BookingsPageState extends State<BookingsPage> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => BookingDetailsScreen(
-                                booking: booking,
+                                booking: booking, 
+                                bookingDetails: const {},
                               ),
                             ),
                           );
@@ -204,7 +171,7 @@ class _BookingsPageState extends State<BookingsPage> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          booking['venue']!,
+                                          booking['venue'] ?? 'Unknown Venue',
                                           style: const TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
@@ -213,7 +180,7 @@ class _BookingsPageState extends State<BookingsPage> {
                                         ),
                                         const SizedBox(height: 6),
                                         Text(
-                                          'Location: ${booking['location']}',
+                                          'Location: ${booking['location'] ?? 'Unknown Location'}',
                                           style: const TextStyle(
                                             fontSize: 16,
                                             color: Colors.grey,
@@ -221,7 +188,7 @@ class _BookingsPageState extends State<BookingsPage> {
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
-                                          'Date: ${booking['date']}',
+                                          'Date: ${booking['date'] ?? 'Unknown Date'}',
                                           style: const TextStyle(
                                             fontSize: 16,
                                             color: Colors.grey,
@@ -235,24 +202,28 @@ class _BookingsPageState extends State<BookingsPage> {
                               ),
                               const SizedBox(height: 15),
                               Text(
-                                'Time: ${booking['time']}',
+                                'Time: ${booking['time'] ?? 'Unknown Time'}',
                                 style: const TextStyle(fontSize: 16, color: Colors.grey),
                               ),
                               Text(
-                                'Hours: ${booking['hours']} hours',
+                                'Hours: ${booking['hours'] ?? '0'} hours',
                                 style: const TextStyle(fontSize: 16, color: Colors.grey),
                               ),
                               Text(
-                                'Total Price: ${booking['totalPrice']}',
+                                'Total Price: ${booking['totalPrice'] ?? '₱0'}',
                                 style: const TextStyle(
                                   fontSize: 16,
+                                  fontFamily: 'Poppins',
                                   fontWeight: FontWeight.bold,
                                   color: Colors.black,
                                 ),
                               ),
                               Text(
-                                'Downpayment: ${booking['downpayment']}',
-                                style: const TextStyle(fontSize: 16, color: Colors.black),
+                                'Downpayment: ${booking['downpayment'] ?? '₱0'}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'Poppins',
+                                  color: Colors.black),
                               ),
                               const SizedBox(height: 10),
                               Align(
@@ -268,14 +239,14 @@ class _BookingsPageState extends State<BookingsPage> {
                                     borderRadius: BorderRadius.circular(20),
                                   ),
                                   child: Text(
-                                    booking['status']!,
+                                    booking['status'] ?? 'Unknown Status',
                                     style: TextStyle(
+                                      fontSize: 14,
                                       color: booking['status'] == 'Confirmed'
                                           ? Colors.green
                                           : booking['status'] == 'Pending'
                                               ? Colors.orange
                                               : Colors.red,
-                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                 ),
@@ -292,6 +263,7 @@ class _BookingsPageState extends State<BookingsPage> {
     );
   }
 }
+
 
 
 

@@ -21,7 +21,7 @@ class _AdminScreenState extends State<AdminScreen> {
     const AdminDashboard(),
     const ManageBookingsPage(),
     const ManageUsersPage(),
-    const AdminManageVenuesPage(),
+    const AdminManageVenuesPage(venues: [],),
     const AdminProfilePage(fullName: '', email: '',),
   ];
 
@@ -63,7 +63,7 @@ class _AdminScreenState extends State<AdminScreen> {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.list_alt),
-              label: 'Dashboard',
+              label: 'Home',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.list_alt),

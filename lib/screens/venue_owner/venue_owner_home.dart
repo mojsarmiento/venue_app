@@ -63,7 +63,7 @@ class _VenueOwnerScreenState extends State<VenueOwnerScreen> {
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: Icon(Icons.dashboard),
-              label: 'Dashboard',
+              label: 'Home',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.book_online),
@@ -71,7 +71,7 @@ class _VenueOwnerScreenState extends State<VenueOwnerScreen> {
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.add),
-              label: 'Add Venue',
+              label: 'Add',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.manage_accounts),

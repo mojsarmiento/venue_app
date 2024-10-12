@@ -18,31 +18,6 @@ class _RequestsPageState extends State<RequestsPage> {
   void initState() {
     super.initState();
 
-    // Default requests data
-    _requests.addAll([
-      {
-        'venue': 'Venue 1',
-        'location': 'Location A',
-        'date': 'Aug 20, 2024',
-        'time': '10:00 AM',
-        'status': 'Approved',
-      },
-      {
-        'venue': 'Venue 2',
-        'location': 'Location B',
-        'date': 'Aug 21, 2024',
-        'time': '1:00 PM',
-        'status': 'Pending',
-      },
-      {
-        'venue': 'Venue 3',
-        'location': 'Location C',
-        'date': 'Aug 22, 2024',
-        'time': '2:00 PM',
-        'status': 'Not Approved',
-      },
-    ]);
-
     // Add new request if available
     if (widget.newRequest != null) {
       _requests.add(widget.newRequest!);
