@@ -9,8 +9,11 @@ class VenueSuccess extends VenueState {}
 class VenueError extends VenueState {
   final String message;
 
-  VenueError({required this.message}); // Constructor with required message parameter
+  VenueError({required this.message});
 }
 
+class VenueTotalLoaded extends VenueState {
+  final int totalVenues;
 
-
+  VenueTotalLoaded(this.totalVenues);
+}

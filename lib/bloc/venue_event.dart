@@ -7,3 +7,6 @@ class AddVenueEvent extends VenueEvent {
 
   AddVenueEvent(this.venue);
 }
+
+
+class FetchTotalVenues extends VenueEvent {}

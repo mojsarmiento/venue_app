@@ -8,6 +8,8 @@ class VenueBloc extends Bloc<VenueEvent, VenueState> {
 
   VenueBloc({required this.venueRepository}) : super(VenueInitial()) {
     on<AddVenueEvent>(_onAddVenueEvent);
+    on<FetchTotalVenues>(_onFetchTotalVenues); // Existing fetch event listener
+
   }
 
   Future<void> _onAddVenueEvent(AddVenueEvent event, Emitter<VenueState> emit) async {
@@ -20,7 +22,20 @@ class VenueBloc extends Bloc<VenueEvent, VenueState> {
       emit(VenueError(message: e.toString())); // Emit error state with a message
     }
   }
+
+  Future<void> _onFetchTotalVenues(FetchTotalVenues event, Emitter<VenueState> emit) async {
+    emit(VenueLoading()); // Emit loading state
+    try {
+      // Fetch total venues from the repository
+      final totalVenues = await venueRepository.fetchTotalVenues();
+      emit(VenueTotalLoaded(totalVenues)); // Emit loaded state with total venues
+    } catch (e) {
+      emit(VenueError(message: e.toString())); // Emit error state with a message
+    }
+  }
 }
+
+
 
 
 

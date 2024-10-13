@@ -145,7 +145,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
                 style: const TextStyle(fontSize: 16, color: Colors.black87),
               ),
               Text(
-                'Price: ₱${widget.pricePerHour} per hour',
+                'Price: ₱${widget.pricePerHour.toStringAsFixed(2)} per hour',
                 style: const TextStyle(
                   fontSize: 16, 
                   fontFamily: 'Poppins',
@@ -346,12 +346,12 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Total Price: ₱$_totalPrice',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                'Total Price: ₱${_totalPrice.toStringAsFixed(2)}.',
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87, fontFamily: 'Poppins'),
               ),
               Text(
-                'Downpayment (50%): ₱$_downpayment',
-                style: const TextStyle(fontSize: 16, color: Colors.black87),
+                'Downpayment (50%): ₱${_downpayment.toStringAsFixed(2)}',
+                style: const TextStyle(fontSize: 16, color: Colors.black87, fontFamily: 'Poppins'),
               ),
               const SizedBox(height: 16),
               CustomButton(
@@ -367,6 +367,7 @@ class _BookingFormScreenState extends State<BookingFormScreen> {
     );
   }
 }
+
 
 
 

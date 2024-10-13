@@ -29,6 +29,28 @@ class VenueRepository {
     }
   }
 
+
+  Future<int> fetchTotalVenues() async {
+    try {
+        final response = await http.get(Uri.parse('$baseUrl/venue_count.php'));
+
+        if (response.statusCode == 200) {
+            final data = jsonDecode(response.body);
+            // Check if 'count' exists and is not null
+            if (data.containsKey('count')) {
+                return int.tryParse(data['count'].toString()) ?? 0; // Return 0 if parsing fails
+            } else {
+                throw Exception('Count key not found in response');
+            }
+        } else {
+            throw Exception('Failed to fetch total venues: ${response.statusCode}');
+        }
+    } catch (e) {
+        throw Exception('Error fetching total venues: $e');
+    }
+}
+
+
   Future<List<Venue>> fetchVenues() async {
     final url = Uri.parse('$baseUrl/fetch_venues.php'); // Adjust this to your API endpoint
     final response = await http.get(url);

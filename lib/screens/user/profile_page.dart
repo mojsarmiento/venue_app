@@ -13,8 +13,8 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String _fullName = 'Loading...'; // Placeholder for full name
-  String _email = 'Loading...'; // Placeholder for email
+  String? fullName;  // Stores user's full name
+  String? email;     // Stores user's email
 
   @override
   void initState() {
@@ -23,29 +23,50 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadUserInfo() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    
-    // Retrieve full name and email from SharedPreferences
-    String? fullName = prefs.getString('full_name'); 
-    String? email = prefs.getString('email'); 
+    final prefs = await SharedPreferences.getInstance();
 
-    // Debugging output to check values
-    print('Loaded Full Name: $fullName');
-    print('Loaded Email: $email');
-
+    // Retrieve and update UI with values from SharedPreferences
     setState(() {
-      // Update UI with retrieved values or fallback to defaults
-      _fullName = fullName ?? 'Unknown User'; 
-      _email = email ?? 'Unknown Email'; 
+      fullName = prefs.getString('full_name') ?? 'Unknown User';
+      email = prefs.getString('email') ?? 'Unknown Email';
     });
   }
 
   Future<void> _logout() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Clear saved user info on logout
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear user data on logout
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),
+    );
+  }
+
+  // Function to show the logout confirmation dialog
+  Future<void> _showLogoutConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Prevent closing the dialog by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to log out?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                _logout(); // Perform logout
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -76,8 +97,9 @@ class _ProfilePageState extends State<ProfilePage> {
               backgroundColor: Colors.transparent,
             ),
             const SizedBox(height: 20),
+            // Full name loaded dynamically from SharedPreferences
             Text(
-              _fullName, // User's full name loaded dynamically
+              fullName ?? 'Loading...', 
               style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -85,8 +107,9 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(height: 8),
+            // Email loaded dynamically from SharedPreferences
             Text(
-              _email, // User's email loaded dynamically
+              email ?? 'Loading...',
               style: const TextStyle(
                 fontSize: 16,
                 color: Colors.grey,
@@ -94,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             const SizedBox(height: 30),
 
-            // ListTile for navigating to different functionalities
+            // ListTiles for different options like Edit Profile, Change Password, etc.
             ListTile(
               leading: const Icon(Icons.edit, color: Color(0xFF00008B)),
               title: const Text('Edit Profile'),
@@ -123,7 +146,7 @@ class _ProfilePageState extends State<ProfilePage> {
               leading: const Icon(Icons.exit_to_app, color: Color(0xFF00008B)),
               title: const Text('Logout'),
               trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: _logout, // Trigger the logout function
+              onTap: _showLogoutConfirmationDialog, // Show the logout confirmation dialog
             ),
 
             const SizedBox(height: 30),
@@ -133,5 +156,4 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 }
-
 

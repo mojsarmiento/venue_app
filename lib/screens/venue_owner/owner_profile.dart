@@ -49,6 +49,35 @@ class _VenueOwnerProfilePageState extends State<VenueOwnerProfilePage> {
     );
   }
 
+  // Function to show the logout confirmation dialog
+  Future<void> _showLogoutConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // Prevent closing the dialog by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to log out?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                _logout(); // Perform logout
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -123,7 +152,7 @@ class _VenueOwnerProfilePageState extends State<VenueOwnerProfilePage> {
               leading: const Icon(Icons.exit_to_app, color: Color(0xFF00008B)),
               title: const Text('Logout'),
               trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: _logout, // Trigger the logout function
+              onTap: _showLogoutConfirmationDialog, // Trigger the logout function
             ),
 
             const SizedBox(height: 30),
