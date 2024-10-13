@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:venue_app/screens/user/requests_page.dart';
-import 'package:venue_app/widgets/custom_button2.dart'; // Import the RequestsPage
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:venue_app/bloc/request_bloc.dart';
+import 'package:venue_app/bloc/request_event.dart';
+import 'package:venue_app/bloc/request_state.dart';
+import 'package:venue_app/widgets/custom_button2.dart';
 
 class RequestVisitFormScreen extends StatefulWidget {
   final String venueName;
-  final String location; // Add venueLocation parameter
+  final String location;
 
   const RequestVisitFormScreen({
     super.key,
     required this.venueName,
-    required this.location, // Initialize venueLocation
+    required this.location,
   });
 
   @override
-  // ignore: library_private_types_in_public_api
   _RequestVisitFormScreenState createState() => _RequestVisitFormScreenState();
 }
 
@@ -40,19 +43,17 @@ class _RequestVisitFormScreenState extends State<RequestVisitFormScreen> {
   }
 
   void _pickTime() async {
-  TimeOfDay? pickedTime = await showTimePicker(
-    context: context,
-    initialTime: const TimeOfDay(hour: 8, minute: 0), // Set the default time to 8 AM
-  );
+    TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: const TimeOfDay(hour: 8, minute: 0),
+    );
 
-  if (pickedTime != null) {
-    // Check if the selected time is within 8 AM to 4 PM
-    if (pickedTime.hour >= 8 && pickedTime.hour < 16) {
-      setState(() {
-        _selectedTime = pickedTime;
-      });
+    if (pickedTime != null) {
+      if (pickedTime.hour >= 8 && pickedTime.hour < 16) {
+        setState(() {
+          _selectedTime = pickedTime;
+        });
       } else {
-        // Show an error if the time is outside the allowed range
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Please select a time between 8 AM and 4 PM.'),
@@ -63,55 +64,59 @@ class _RequestVisitFormScreenState extends State<RequestVisitFormScreen> {
     }
   }
 
-
-  // Mock submit request function
   void _submitRequest() {
-  if (_formKey.currentState!.validate() &&
-      _selectedDate != null &&
-      _selectedTime != null) {
-    // Collect form data
-    final requestData = {
-      'venue': widget.venueName,
-      'location': widget.location,
-      'date': '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
-      'time': _selectedTime!.format(context),
-      'status': 'Pending', // Set initial status
-    };
+    if (_formKey.currentState!.validate() &&
+        _selectedDate != null &&
+        _selectedTime != null) {
+      
+      String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate!);
+      String formattedTime = DateFormat('HH:mm:ss').format(DateTime(
+        0,
+        1,
+        1,
+        _selectedTime!.hour,
+        _selectedTime!.minute,
+      ));
 
-    // Show SnackBar with success message and action button
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Request submitted successfully!'),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 3),
-        action: SnackBarAction(
-          label: 'View My Requests',
-          textColor: Colors.white,
-          onPressed: () {
-            // Navigate to RequestsPage
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => RequestsPage(
-                  newRequest: requestData,
-                ),
-              ),
-            );
-          },
-        ),
-      ),
-    );
+      context.read<RequestBloc>().add(SubmitRequestEvent(
+        venue: widget.venueName,
+        location: widget.location,
+        fullName: _fullNameController.text,
+        email: _emailController.text,
+        mobileNumber: _phoneNumberController.text,
+        date: formattedDate,
+        time: formattedTime,
+      ));
 
-    // Clear form fields
-    _fullNameController.clear();
-    _emailController.clear();
-    _phoneNumberController.clear();
-    setState(() {
-      _selectedDate = null;
-      _selectedTime = null;
-    });
+      // Listen to RequestBloc states
+      context.read<RequestBloc>().stream.listen((state) {
+        if (state is RequestSubmitted) {
+          // Show success Snackbar
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message), // Assuming your RequestSubmitted has a message property
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          // Clear text fields
+          _fullNameController.clear();
+          _emailController.clear();
+          _phoneNumberController.clear();
+          setState(() {
+            _selectedDate = null;
+            _selectedTime = null;
+          });
+        } else if (state is RequestError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      });
     } else {
-      // Show error message if validation fails
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill out all fields correctly.'),
@@ -121,7 +126,13 @@ class _RequestVisitFormScreenState extends State<RequestVisitFormScreen> {
     }
   }
 
-
+  @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _phoneNumberController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,9 +140,7 @@ class _RequestVisitFormScreenState extends State<RequestVisitFormScreen> {
       appBar: AppBar(
         title: const Text(
           'Request Visit',
-          style: TextStyle(
-            color: Colors.white,
-          ),
+          style: TextStyle(color: Colors.white),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -220,7 +229,7 @@ class _RequestVisitFormScreenState extends State<RequestVisitFormScreen> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Preffered Date:',
+                'Preferred Date:',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -252,7 +261,7 @@ class _RequestVisitFormScreenState extends State<RequestVisitFormScreen> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Preffered Time:',
+                'Preferred Time:',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -284,8 +293,8 @@ class _RequestVisitFormScreenState extends State<RequestVisitFormScreen> {
               ),
               const SizedBox(height: 16),
               CustomButtonIn(
-                text: 'Submit Request', 
-                onPressed: _submitRequest
+                text: 'Submit Request',
+                onPressed: _submitRequest,
               ),
             ],
           ),
@@ -294,8 +303,6 @@ class _RequestVisitFormScreenState extends State<RequestVisitFormScreen> {
     );
   }
 }
-
-
 
 
 

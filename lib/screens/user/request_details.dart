@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 class RequestVisitDetailsScreen extends StatelessWidget {
-  final Map<String, String?> requestVisitDetails;
+   final Map<String, dynamic> requestVisitDetails; // Update type here
 
-  const RequestVisitDetailsScreen({
-    super.key,
-    required this.requestVisitDetails,
-  });
+  const RequestVisitDetailsScreen({super.key, required this.requestVisitDetails});
 
   @override
   Widget build(BuildContext context) {
