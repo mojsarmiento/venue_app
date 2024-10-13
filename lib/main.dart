@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:venue_app/bloc/request_bloc.dart';
+import 'package:venue_app/repository/request_repository.dart';
 import 'package:venue_app/repository/venue_repository.dart';
 import 'package:venue_app/repository/user_repository.dart'; // Import UserRepository
 import 'package:venue_app/splashscreen.dart';
@@ -24,6 +26,9 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => UserBloc(userRepository: UserRepository()), // Provide UserBloc
         ),
+        BlocProvider(
+          create: (context) => RequestBloc(requestRepository: RequestRepository())
+        ),
       ],
       child: MaterialApp(
         title: 'Venue Reservation App',
@@ -38,7 +43,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-
-
 
