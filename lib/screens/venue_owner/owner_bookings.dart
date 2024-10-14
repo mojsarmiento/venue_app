@@ -21,7 +21,6 @@ class RequestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 6,
-      color: const Color.fromARGB(255, 220, 210, 255),
       margin: const EdgeInsets.symmetric(vertical: 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
@@ -309,6 +308,7 @@ class _OwnerBookingsPageState extends State<OwnerBookingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           'Bookings / Requests',

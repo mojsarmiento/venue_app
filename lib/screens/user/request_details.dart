@@ -39,6 +39,11 @@ class RequestVisitDetailsScreen extends StatelessWidget {
         statusText = 'Rejected';
         statusIcon = const Icon(Icons.cancel, color: Colors.red);
         break;
+      case 'Done':
+        statusColor = Colors.blue;
+        statusText = 'Done';
+        statusIcon = const Icon(Icons.check_circle, color: Colors.blue);
+        break;
       default:
         statusColor = Colors.grey;
         statusText = 'Unknown';
