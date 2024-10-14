@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:venue_app/bloc/request_bloc.dart';
+import 'package:venue_app/bloc/request_event.dart';
+import 'package:venue_app/bloc/request_state.dart';
 import 'package:venue_app/bloc/user_bloc.dart';
 import 'package:venue_app/bloc/user_event.dart';
 import 'package:venue_app/bloc/user_state.dart';
 import 'package:venue_app/bloc/venue_bloc.dart';
 import 'package:venue_app/bloc/venue_event.dart';
 import 'package:venue_app/bloc/venue_state.dart';
+import 'package:venue_app/repository/request_repository.dart';
 import 'package:venue_app/repository/user_repository.dart';
 import 'package:venue_app/repository/venue_repository.dart';
+import 'package:venue_app/screens/admin/admin_bookings.dart';
 import 'package:venue_app/screens/admin/admin_users.dart';
 import 'package:venue_app/screens/admin/admin_venues.dart';
 
@@ -42,6 +47,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
             final userRepository = UserRepository(); // Initialize your user repository
             return UserBloc(userRepository: userRepository)
               ..add(FetchUserCountEvent()); // Fetch user count on initialization
+          },
+        ),
+        BlocProvider(
+          create: (context) {
+            final requestRepository = RequestRepository(); // Initialize your request repository
+            return RequestBloc(requestRepository: requestRepository)
+              ..add(FetchTotalRequest()); // Fetch total requests on initialization
           },
         ),
       ],
@@ -81,22 +93,28 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 }),
                 const SizedBox(height: 16),
 
-                // Total Request Visits
-                BlocBuilder<VenueBloc, VenueState>(builder: (context, state) {
-                  if (state is VenueLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (state is VenueTotalLoaded) {
-                    return _buildStatCard(
-                      context,
-                      icon: Icons.message,
-                      title: 'Total Request Visits',
-                      value: '5', // Replace with actual request visits count from your state
-                    );
-                  } else if (state is VenueError) {
-                    return Center(child: Text(state.message));
-                  }
-                  return Container();
-                }),
+                BlocBuilder<RequestBloc, RequestState>(
+                          builder: (context, state) {
+                            if (state is RequestLoading) {
+                              return const Center(child: CircularProgressIndicator());
+                            } else if (state is RequestTotalLoaded) {
+                              return _buildStatCard(
+                                context,
+                                icon: Icons.message,
+                                title: 'Total Request Visits',
+                                value: state.totalRequest.toString(), 
+                                onTap: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => const AdminBookingsPage(),
+                                ));
+                              },// Display total requests
+                              );
+                            } else if (state is RequestError) {
+                              return Center(child: Text(state.message));
+                            }
+                            return Container(); // Return empty container if in initial state
+                          },
+                        ),
                 const SizedBox(height: 16),
 
                 // Total Earnings

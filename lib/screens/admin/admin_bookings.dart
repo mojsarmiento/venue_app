@@ -1,22 +1,317 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:venue_app/models/request.dart';
 
-class ManageBookingsPage extends StatefulWidget {
-  const ManageBookingsPage({super.key});
+class RequestCard extends StatelessWidget {
+  final Request request;
+  final VoidCallback onApprove;
+  final VoidCallback onReject;
+  final VoidCallback onMarkAsDone;
+
+  const RequestCard({
+    super.key,
+    required this.request,
+    required this.onApprove,
+    required this.onReject,
+    required this.onMarkAsDone,
+  });
 
   @override
-  // ignore: library_private_types_in_public_api
-  _ManageBookingsPageState createState() => _ManageBookingsPageState();
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 6,
+      color: const Color.fromARGB(255, 220, 210, 255),
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                    request.fullName,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF00008B),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: request.status == 'Approved'
+                        ? Colors.green[100]
+                        : request.status == 'Rejected'
+                            ? Colors.red[100]
+                            : request.status == 'Done'
+                                ? Colors.blue[100]
+                                : Colors.orange[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    request.status,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: request.status == 'Approved'
+                          ? Colors.green
+                          : request.status == 'Rejected'
+                              ? Colors.red
+                              : request.status == 'Done'
+                                  ? Colors.blue
+                                  : Colors.orange,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text('Email: ${request.email}', style: const TextStyle(fontSize: 16)),
+            Text('Mobile: ${request.mobileNumber}', style: const TextStyle(fontSize: 16)),
+            Text('Venue: ${request.venueName}', style: const TextStyle(fontSize: 16)),
+            Text('Location: ${request.location}', style: const TextStyle(fontSize: 16)),
+            Text('Request Date: ${request.requestDate}', style: const TextStyle(fontSize: 16)),
+            Text('Request Time: ${request.requestTime}', style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 16),
+            // Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Flexible( // Allow buttons to shrink if needed
+                  child: ElevatedButton(
+                    onPressed: onApprove,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text(
+                      'Approve',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Flexible( // Allow buttons to shrink if needed
+                  child: ElevatedButton(
+                    onPressed: onReject,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text(
+                      'Reject',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Flexible( // Allow buttons to shrink if needed
+                  child: ElevatedButton(
+                    onPressed: onMarkAsDone,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text(
+                      'Mark as Done',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
-class _ManageBookingsPageState extends State<ManageBookingsPage> {
-  String _selectedOption = 'Bookings';
+
+// BookingsPage widget
+class AdminBookingsPage extends StatefulWidget {
+  const AdminBookingsPage({super.key});
+
+  @override
+  _AdminBookingsPageState createState() => _AdminBookingsPageState();
+}
+
+class _AdminBookingsPageState extends State<AdminBookingsPage> {
+  List<Request> requests = [];
+  String _selectedOption = 'Requests'; // Default selected option
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRequests(); // Fetch requests when the widget is initialized
+  }
+
+  Future<void> fetchRequests() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2/database/fetch_requests.php'));
+
+    if (response.statusCode == 200) {
+      // Parse response as a List
+      List<dynamic> jsonData = json.decode(response.body);
+
+      setState(() {
+        requests = jsonData.map<Request>((item) {
+          return Request(
+            id: item['id'] ?? '',
+            fullName: item['full_name'] ?? '',
+            email: item['email'] ?? '',
+            mobileNumber: item['mobile_number'] ?? '',
+            venueName: item['venue_name'] ?? '',
+            location: item['location'] ?? '',
+            requestDate: item['request_date'] ?? '',
+            requestTime: item['request_time'] ?? '',
+            status: item['status'] ?? 'Pending',
+          );
+        }).toList(); // Map each item to a Request object
+      });
+    } else {
+      throw Exception('Failed to load requests');
+    }
+  }
+
+  Future<void> markAsDone(String requestId) async {
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2/database/mark_as_done.php'),
+      body: json.encode({'id': requestId}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      fetchRequests();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Marked as Done.')));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to mark as done.')));
+    }
+  }
+
+  Future<void> approveRequest(String requestId) async {
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2/database/approve_request.php'),
+      body: json.encode({'id': requestId}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      fetchRequests();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to approve request.')));
+    }
+  }
+
+  Future<void> rejectRequest(String requestId) async {
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2/database/reject_request.php'),
+      body: json.encode({'id': requestId}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      fetchRequests();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to reject request.')));
+    }
+  }
+
+  Future<void> showApproveDialog(Request request) async {
+    bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Approve Request'),
+          content: const Text('Are you sure you want to approve this request?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // Return false when canceled
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // Return true when approved
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      approveRequest(request.id);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Request approved.')));
+    }
+  }
+
+  Future<void> showRejectDialog(Request request) async {
+    bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Reject Request'),
+          content: const Text('Are you sure you want to reject this request?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // Return false when canceled
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // Return true when rejected
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      rejectRequest(request.id);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Request rejected.')));
+    }
+  }
+
+  Future<void> showMarkAsDoneDialog(Request request) async {
+    bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Mark as Done'),
+          content: const Text('Are you sure you want to mark this request as done?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // Return false when canceled
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // Return true when marked as done
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      markAsDone(request.id);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Request marked as done.')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Manage Bookings / Requests',
+          'Bookings / Requests',
           style: TextStyle(
             color: Color(0xFF00008B),
             fontWeight: FontWeight.bold,
@@ -50,271 +345,34 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
     );
   }
 
-  Widget _buildBookingsList() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: ListView(
-        children: const [
-          BookingCard(
-            name: 'John Doe',
-            venueName: 'Venue ABC',
-            location: 'Location ABC',
-            date: '2024-08-22',
-            time: '15:00',
-            hours: '0',
-            totalPrice: '₱0',
-            downPayment: '₱0',
-            
-          ),
-          SizedBox(height: 16),
-          BookingCard(
-            name: 'Jane Smith',
-            venueName: 'Venue XYZ',
-            location: 'Location XYZ',
-            date: '2024-08-25',
-            time: '18:00',
-            hours: '0',
-            totalPrice: '₱0',
-            downPayment: '₱0',
-          ),
-          // Add more booking cards as needed
-        ],
-      ),
-    );
-  }
-
   Widget _buildRequestsList() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: ListView(
-        children: const [
-          RequestCard(
-            name: 'Alice Johnson',
-            venueName: 'Venue A',
-            location: 'Location A',
-            date: '2024-08-22',
-            time: '10:00 AM',
-          ),
-          SizedBox(height: 16),
-          RequestCard(
-            name: 'Bob Brown',
-            venueName: 'Venue B',
-            location: 'Location B',
-            date: '2024-08-25',
-            time: '2:00 PM',
-          ),
-          // Add more request cards as needed
-        ],
+      child: ListView.builder(
+        itemCount: requests.length,
+        itemBuilder: (context, index) {
+          return RequestCard(
+            request: requests[index],
+            onApprove: () {
+              showApproveDialog(requests[index]);
+            },
+            onReject: () {
+              showRejectDialog(requests[index]);
+            },
+            onMarkAsDone: () {
+              showMarkAsDoneDialog(requests[index]);
+            }
+          );
+        },
       ),
     );
   }
-}
 
-class BookingCard extends StatelessWidget {
-  final String name;
-  final String venueName;
-  final String location;
-  final String date;
-  final String time;
-  final String hours;
-  final String totalPrice;
-  final String downPayment;
-
-  const BookingCard({
-    super.key,
-    required this.name,
-    required this.venueName,
-    required this.location,
-    required this.date,
-    required this.time,
-    required this.hours,
-    required this.totalPrice,
-    required this.downPayment,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Reserver: $name',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF00008B),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Venue: $venueName',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Location: $location',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Date: $date',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Time: $time',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Hours: $hours',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Total Price: $totalPrice',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Downpayment: $downPayment',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement approve booking functionality
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  ),
-                  child: const Text(
-                    'Approve',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement decline booking functionality
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  ),
-                  child: const Text(
-                    'Decline',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
+  // Dummy function for bookings list
+  Widget _buildBookingsList() {
+    return const Center(child: Text('No bookings available.')); // Replace with actual bookings list
   }
-}
-
-class RequestCard extends StatelessWidget {
-  final String name;
-  final String venueName;
-  final String location;
-  final String date;
-  final String time;
-
-  const RequestCard({
-    super.key,
-    required this.name,
-    required this.venueName,
-    required this.location,
-    required this.date,
-    required this.time,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Requester: $name',
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF00008B),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Venue: $venueName',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Location: $location',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Date: $date',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Time: $time',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement approve request functionality
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  ),
-                  child: const Text(
-                    'Approve',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement decline request functionality
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  ),
-                  child: const Text(
-                    'Decline',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  
 }
 
 

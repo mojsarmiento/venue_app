@@ -17,7 +17,7 @@ class _VenueOwnerScreenState extends State<VenueOwnerScreen> {
 
   static const List<Widget> _widgetOptions = <Widget>[
     DashboardScreen(),
-    BookingsPage(),
+    OwnerBookingsPage(),
     AddVenuePage(venues: [],),
     ManageVenuesPage(venues: [],),
     VenueOwnerProfilePage(),

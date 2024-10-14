@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:venue_app/bloc/request_bloc.dart'; // Adjust this import as needed
+import 'package:venue_app/bloc/request_event.dart';
+import 'package:venue_app/bloc/request_state.dart';
 
 class OwnerRequests extends StatelessWidget {
   const OwnerRequests({super.key});
@@ -20,23 +24,36 @@ class OwnerRequests extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: const [
-            RequestCard(
-              name: 'Alice Johnson',
-              venueName: 'Venue A',
-              date: '2024-08-22',
-              time: '10:00 AM',
-            ),
-            SizedBox(height: 16),
-            RequestCard(
-              name: 'Bob Brown',
-              venueName: 'Venue B',
-              date: '2024-08-25',
-              time: '2:00 PM',
-            ),
-            // Add more request cards as needed
-          ],
+        child: BlocBuilder<RequestBloc, RequestState>(
+          builder: (context, state) {
+            if (state is RequestLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is RequestLoaded) {
+              return ListView.builder(
+                itemCount: state.requests.length,
+                itemBuilder: (context, index) {
+                  final request = state.requests[index];
+                  return RequestCard(
+                    name: request.fullName,
+                    venueName: request.venueName,
+                    date: request.requestDate,
+                    time: request.requestTime,
+                    onApprove: () {
+                      // Dispatch approve request event
+                      context.read<RequestBloc>().add(ApproveRequestEvent(request.id));
+                    },
+                    onReject: () {
+                      // Dispatch reject request event
+                      context.read<RequestBloc>().add(RejectRequestEvent(request.id));
+                    },
+                  );
+                },
+              );
+            } else if (state is RequestError) {
+              return Center(child: Text(state.message));
+            }
+            return const Center(child: Text('No requests found.'));
+          },
         ),
       ),
     );
@@ -48,14 +65,18 @@ class RequestCard extends StatelessWidget {
   final String venueName;
   final String date;
   final String time;
+  final VoidCallback onApprove;
+  final VoidCallback onReject;
 
   const RequestCard({
-    Key? key,
+    super.key,
     required this.name,
     required this.venueName,
     required this.date,
     required this.time,
-  }) : super(key: key);
+    required this.onApprove,
+    required this.onReject,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -94,27 +115,27 @@ class RequestCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ElevatedButton(
-                  onPressed: () {
-                    // Implement approve request functionality
-                  },
+                  onPressed: onApprove,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   ),
-                  child: const Text('Approve',
-                    style: TextStyle(color: Colors.white),),
+                  child: const Text(
+                    'Approve',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
-                  onPressed: () {
-                    // Implement decline request functionality
-                  },
+                  onPressed: onReject,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   ),
-                  child: const Text('Decline',
-                    style: TextStyle(color: Colors.white),),
+                  child: const Text(
+                    'Reject',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -124,3 +145,4 @@ class RequestCard extends StatelessWidget {
     );
   }
 }
+

@@ -20,5 +20,26 @@ class SubmitRequestEvent extends RequestEvent {
   });
 }
 
-
 class FetchRequests extends RequestEvent {}
+
+// New event for approving a request
+class ApproveRequestEvent extends RequestEvent {
+  final String id; // Assuming request ID is of type int
+
+  ApproveRequestEvent(this.id);
+}
+
+// New event for rejecting a request
+class RejectRequestEvent extends RequestEvent {
+  final String id; // Assuming request ID is of type int
+
+  RejectRequestEvent(this.id);
+}
+
+class FetchTotalRequest extends RequestEvent {}
+
+class MarkAsDoneEvent extends RequestEvent {
+  final String id;
+
+  MarkAsDoneEvent(this.id);
+}

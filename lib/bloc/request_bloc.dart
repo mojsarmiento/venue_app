@@ -1,17 +1,22 @@
 // request_bloc.dart
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:http/http.dart' as http;
-import 'package:venue_app/repository/request_repository.dart';
 import 'dart:convert';
+import 'dart:math';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:venue_app/repository/request_repository.dart';
 import 'request_event.dart';
 import 'request_state.dart';
+import 'package:http/http.dart' as http;
 
 class RequestBloc extends Bloc<RequestEvent, RequestState> {
   final RequestRepository requestRepository;
-  
+
   RequestBloc({required this.requestRepository}) : super(RequestInitial()) {
     on<SubmitRequestEvent>(_onSubmitRequest);
-    on<FetchRequests>(_onFetchRequests); 
+    on<FetchRequests>(_onFetchRequests);
+    on<ApproveRequestEvent>(_onApproveRequest);
+    on<RejectRequestEvent>(_onRejectRequest);
+    on<FetchTotalRequest>(_onFetchTotalRequest);
+    on<MarkAsDoneEvent>(_onMarkAsDone); // Add the new event handler here
   }
 
   Future<void> _onSubmitRequest(
@@ -38,13 +43,13 @@ class RequestBloc extends Bloc<RequestEvent, RequestState> {
         if (data['status'] == 'success') {
           emit(RequestSubmitted(data['message']));
         } else {
-          emit(RequestError(data['message']));
+          emit(RequestError(message: data['message'] ?? 'Unknown error'));
         }
       } else {
-        emit(RequestError('Failed to submit request. Status code: ${response.statusCode}'));
+        emit(RequestError(message: 'Error: ${response.statusCode}'));
       }
     } catch (e) {
-      emit(RequestError('Error: ${e.toString()}'));
+      emit(RequestError(message: e.toString()));
     }
   }
 
@@ -54,12 +59,57 @@ class RequestBloc extends Bloc<RequestEvent, RequestState> {
       final requests = await requestRepository.fetchRequests();
       emit(RequestLoaded(requests));
     } catch (e) {
-      emit(RequestError('Failed to fetch requests: ${e.toString()}'));
+      emit(RequestError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onApproveRequest(ApproveRequestEvent event, Emitter<RequestState> emit) async {
+    emit(RequestSubmitting());
+
+    try {
+      await requestRepository.approveRequest(event.id);
+      emit(RequestApproved('Request approved successfully.'));
+      final requests = await requestRepository.fetchRequests();
+      emit(RequestLoaded(requests));
+    } catch (e) {
+      emit(RequestError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onRejectRequest(RejectRequestEvent event, Emitter<RequestState> emit) async {
+    emit(RequestSubmitting());
+
+    try {
+      await requestRepository.rejectRequest(event.id);
+      emit(RequestRejected('Request rejected successfully.'));
+      final requests = await requestRepository.fetchRequests();
+      emit(RequestLoaded(requests));
+    } catch (e) {
+      emit(RequestError(message: e.toString()));
+    }
+  }
+
+  Future<void> _onFetchTotalRequest(FetchTotalRequest event, Emitter<RequestState> emit) async {
+    emit(RequestLoading());
+    try {
+      final totalVenues = await requestRepository.fetchTotalRequest();
+      emit(RequestTotalLoaded(totalVenues));
+    } catch (e) {
+      emit(RequestError(message: e.toString()));
+    }
+  }
+
+  // New method to handle marking a request as done
+  Future<void> _onMarkAsDone(MarkAsDoneEvent event, Emitter<RequestState> emit) async {
+    emit(RequestSubmitting());
+
+    try {
+      await requestRepository.markAsDone(event.id); // Call the repository method
+      emit(RequestApproved('Request marked as done successfully.'));
+      final requests = await requestRepository.fetchRequests(); // Fetch updated requests
+      emit(RequestLoaded(requests));
+    } catch (e) {
+      emit(RequestError(message: e.toString()));
     }
   }
 }
-
-
-
-
-

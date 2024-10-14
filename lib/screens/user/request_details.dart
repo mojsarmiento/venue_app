@@ -34,9 +34,9 @@ class RequestVisitDetailsScreen extends StatelessWidget {
         statusText = 'Pending';
         statusIcon = const Icon(Icons.access_time, color: Colors.orange);
         break;
-      case 'Not Approved':
+      case 'Rejected':
         statusColor = Colors.red;
-        statusText = 'Not Approved';
+        statusText = 'Rejected';
         statusIcon = const Icon(Icons.cancel, color: Colors.red);
         break;
       default:
@@ -121,7 +121,7 @@ class RequestVisitDetailsScreen extends StatelessWidget {
 
                   // Venue Name with null safety check
                   Text(
-                    'Venue: ${requestVisitDetails['venue'] ?? 'Unknown Venue'}',
+                    'Venue: ${requestVisitDetails['venue_name'] ?? 'Unknown Venue'}',
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -142,7 +142,7 @@ class RequestVisitDetailsScreen extends StatelessWidget {
 
                   // Visit Date with null safety check
                   Text(
-                    'Date: ${requestVisitDetails['date'] ?? 'Unknown Date'}',
+                    'Date: ${requestVisitDetails['request_date'] ?? 'Unknown Date'}',
                     style: const TextStyle(
                       fontSize: 18,
                       color: Colors.black87,
@@ -152,7 +152,7 @@ class RequestVisitDetailsScreen extends StatelessWidget {
 
                   // Visit Time with null safety check
                   Text(
-                    'Time: ${requestVisitDetails['time'] ?? 'Unknown Time'}',
+                    'Time: ${requestVisitDetails['request_time'] ?? 'Unknown Time'}',
                     style: const TextStyle(
                       fontSize: 18,
                       color: Colors.black87,

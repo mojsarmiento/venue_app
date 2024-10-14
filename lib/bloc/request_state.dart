@@ -25,9 +25,29 @@ class RequestSubmitted extends RequestState {
   RequestSubmitted(this.message);
 }
 
+// State when a request has been approved successfully.
+class RequestApproved extends RequestState {
+  final String message;
+
+  RequestApproved(this.message);
+}
+
+// State when a request has been rejected successfully.
+class RequestRejected extends RequestState {
+  final String message;
+
+  RequestRejected(this.message);
+}
+
 // State when there's an error in loading or submitting requests.
 class RequestError extends RequestState {
   final String message;
 
-  RequestError(this.message);
+  RequestError({required this.message});
+}
+
+class RequestTotalLoaded extends RequestState {
+  final int totalRequest;
+
+  RequestTotalLoaded(this.totalRequest);
 }

@@ -19,7 +19,7 @@ class _AdminScreenState extends State<AdminScreen> {
   // Define the pages for each tab
   final List<Widget> _widgetOptions = <Widget>[
     const AdminDashboard(),
-    const ManageBookingsPage(),
+    const AdminBookingsPage(),
     const ManageUsersPage(),
     const AdminManageVenuesPage(venues: [],),
     const AdminProfilePage(fullName: '', email: '',),
