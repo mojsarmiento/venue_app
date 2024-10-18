@@ -1,3 +1,4 @@
+import 'dart:io'; // Make sure to import dart:io for File
 import 'package:flutter/material.dart';
 import 'package:venue_app/screens/user/booking_form.dart';
 import 'package:venue_app/screens/user/request_visit_form.dart';
@@ -6,12 +7,11 @@ import 'package:venue_app/widgets/custom_button2.dart';
 class VenueDetailsScreen extends StatefulWidget {
   final String name;
   final String location;
-  final List<String> images;
+  final List<String> images; // Assuming these are paths to image files
   final double pricePerHour;
   final String availability;
   final String category;
   final String additionalDetails;
-  
 
   const VenueDetailsScreen({
     super.key,
@@ -84,13 +84,13 @@ class _VenueDetailsScreenState extends State<VenueDetailsScreen> {
                 controller: _pageController,
                 itemCount: widget.images.length,
                 itemBuilder: (BuildContext context, int index) {
-                  final image = widget.images[index];
+                  final imagePath = widget.images[index];
                   return Container(
                     margin: const EdgeInsets.symmetric(horizontal: 5.0),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(20),
-                      child: Image.asset(
-                        image,
+                      child: Image.file(
+                        File(imagePath), // Load image from file
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return const Center(
@@ -197,9 +197,9 @@ class _VenueDetailsScreenState extends State<VenueDetailsScreen> {
               ),
             ),
             Text(
-                '₱${widget.pricePerHour.toStringAsFixed(2)} per hour',
-                style: const TextStyle(
-                fontFamily: 'Poppins',  // Ensure 'Poppins' is used
+              '₱${widget.pricePerHour.toStringAsFixed(2)} per hour',
+              style: const TextStyle(
+                fontFamily: 'Poppins', // Ensure 'Poppins' is used
                 fontSize: 16,
                 color: Color(0xFF00008B),
               ),
@@ -216,7 +216,8 @@ class _VenueDetailsScreenState extends State<VenueDetailsScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => RequestVisitFormScreen(
-                        venueName: widget.name, location: widget.location,
+                        venueName: widget.name, 
+                        location: widget.location,
                       ),
                     ),
                   );
@@ -234,7 +235,7 @@ class _VenueDetailsScreenState extends State<VenueDetailsScreen> {
                       builder: (context) => BookingFormScreen(
                         venueName: widget.name,
                         pricePerHour: widget.pricePerHour,
-                        location: widget.location, 
+                        location: widget.location,
                       ),
                     ),
                   );
@@ -247,7 +248,6 @@ class _VenueDetailsScreenState extends State<VenueDetailsScreen> {
     );
   }
 }
-
 
 
 

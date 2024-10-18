@@ -5,7 +5,7 @@ import 'package:venue_app/models/request.dart';
 
 class RequestRepository {
   Future<List<Request>> fetchRequests() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2/database/fetch_requests.php'));
+    final response = await http.get(Uri.parse('http://192.168.0.47/database/fetch_requests.php'));
 
     if (response.statusCode == 200) {
       // Decode the JSON response directly to a List
@@ -20,7 +20,7 @@ class RequestRepository {
 
   Future<int> fetchTotalRequest() async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2/database/request_count.php'));
+      final response = await http.get(Uri.parse('http://192.168.0.47/database/request_count.php'));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -39,7 +39,7 @@ class RequestRepository {
   }
 
   Future<void> deleteRequests(String id) async {
-    final url = Uri.parse('http://10.0.2.2/database/delete_requests.php'); // Adjust this to your API endpoint
+    final url = Uri.parse('http://192.168.0.47/database/delete_requests.php'); // Adjust this to your API endpoint
 
     final response = await http.post(
       url,
@@ -60,7 +60,7 @@ class RequestRepository {
 
   Future<void> approveRequest(String id) async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2/database/approve_request.php'),
+      Uri.parse('http://192.168.0.47/database/approve_request.php'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'id': id}),
     );
@@ -72,7 +72,7 @@ class RequestRepository {
 
   Future<void> rejectRequest(String id) async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2/database/reject_request.php'),
+      Uri.parse('http://192.168.0.47/database/reject_request.php'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'id': id}),
     );
@@ -85,7 +85,7 @@ class RequestRepository {
   // New method to mark a request as done
   Future<void> markAsDone(String id) async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2/database/mark_as_done.php'),
+      Uri.parse('http://192.168.0.47/database/mark_as_done.php'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'id': id}),
     );

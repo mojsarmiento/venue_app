@@ -15,7 +15,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   void _sendResetLink() async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2/database/forgot_password.php'),
+      Uri.parse('http://192.168.0.47/database/forgot_password.php'),
       body: {'email': _emailController.text},
     );
 

@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:intl/intl.dart';
+import 'package:venue_app/models/booking.dart';
 import 'package:venue_app/widgets/custom_button2.dart';
 
 class BookingDetailsScreen extends StatefulWidget {
-  final Map<String, String> booking;
+  final Booking booking;
 
   const BookingDetailsScreen({
     super.key,
-    required this.booking, required Map<String, String> bookingDetails,
+    required this.booking, required Booking bookingDetails,
   });
 
   @override
@@ -35,6 +37,30 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
     );
   }
 
+  String _getStatusMessage(String status) {
+    switch (status) {
+      case 'Approved':
+        return 'Your booking has been approved! Please arrive on time.';
+      case 'Pending':
+        return 'Your booking is pending approval. We will notify you soon.';
+      case 'Rejected':
+        return 'Unfortunately, your booking has been rejected.';
+      case 'Done':
+        return 'Thank you for using our service! We hope to see you again.';
+      default:
+        return 'Status not recognized. Please check your booking.';
+    }
+  }
+
+  String _formatCurrency(double amount) {
+    final formatter = NumberFormat.currency(
+      locale: 'en_PH',
+      symbol: '₱',
+      decimalDigits: 2,
+    );
+    return formatter.format(amount);
+  }
+
   @override
   Widget build(BuildContext context) {
     // Placeholder images for carousel
@@ -44,8 +70,8 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
       'assets/images/venuetest.jpg',
     ];
 
-    // Extract the status from the booking map
-    final String status = widget.booking['status'] ?? 'Unknown';
+    // Extract the status from the booking
+    final String status = widget.booking.status;
 
     // Determine the status color and text
     Color statusColor;
@@ -53,7 +79,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
     Icon statusIcon;
 
     switch (status) {
-      case 'Confirmed':
+      case 'Approved':
         statusColor = Colors.green;
         statusText = 'Confirmed';
         statusIcon = const Icon(Icons.check_circle, color: Colors.green);
@@ -63,10 +89,15 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
         statusText = 'Pending';
         statusIcon = const Icon(Icons.access_time, color: Colors.orange);
         break;
-      case 'Cancelled':
+      case 'Rejected':
         statusColor = Colors.red;
         statusText = 'Cancelled';
         statusIcon = const Icon(Icons.cancel, color: Colors.red);
+        break;
+      case 'Done':
+        statusColor = Colors.blue;
+        statusText = 'Done';
+        statusIcon = const Icon(Icons.done_all, color: Colors.blue);
         break;
       default:
         statusColor = Colors.grey;
@@ -151,7 +182,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Venue: ${widget.booking['venue'] ?? 'Unknown Venue'}',
+                        'Venue: ${widget.booking.venueName}',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -160,27 +191,27 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Location: ${widget.booking['location'] ?? 'Unknown Location'}',
+                        'Location: ${widget.booking.location}',
                         style: const TextStyle(fontSize: 18),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Date: ${widget.booking['date'] ?? 'Unknown Date'}',
+                        'Date: ${widget.booking.date}',
                         style: const TextStyle(fontSize: 18),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Time: ${widget.booking['time'] ?? 'Unknown Time'}',
+                        'Time: ${DateFormat.jm().format(DateFormat("HH:mm").parse(widget.booking.time))}',
                         style: const TextStyle(fontSize: 18),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Hours: ${widget.booking['hours'] ?? 'Unknown Hours'}',
+                        'Hours: ${widget.booking.hours}',
                         style: const TextStyle(fontSize: 18),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Total Price: ${widget.booking['totalPrice'] ?? 'Unknown Price'}',
+                        'Total Price: ${_formatCurrency(widget.booking.totalPrice)}',
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -189,7 +220,7 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Downpayment: ${widget.booking['downpayment'] ?? 'Unknown Downpayment'}',
+                        'Downpayment: ${_formatCurrency(widget.booking.downpayment)}',
                         style: const TextStyle(fontSize: 18, color: Colors.black),
                       ),
                       const SizedBox(height: 16),
@@ -208,6 +239,13 @@ class _BookingDetailsScreenState extends State<BookingDetailsScreen> {
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Status Message
+                      Text(
+                        _getStatusMessage(status),
+                        style: const TextStyle(fontSize: 16, color: Colors.black54),
                       ),
                       const SizedBox(height: 24),
 

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  final String baseUrl = 'http://10.0.2.2/database/login.php'; // Base URL for your API
+  final String baseUrl = 'http://192.168.0.47/database/login.php'; // Base URL for your API
 
   // Method to call login API
   Future<ApiResponse> login(String email, String password) async {

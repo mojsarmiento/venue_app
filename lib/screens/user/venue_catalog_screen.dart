@@ -1,4 +1,4 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io'; // Import for File
 import 'package:flutter/material.dart';
 import 'package:venue_app/models/venue.dart';
 import 'package:venue_app/screens/user/venue_details_screen.dart';
@@ -16,6 +16,18 @@ class _VenueCatalogScreenState extends State<VenueCatalogScreen> {
   String selectedCategory = 'All'; // Selected category filter
   List<Venue> venues = []; // List of venues fetched from your model
   bool isLoading = true; // Loading state
+
+  // Define the list of categories (include all your database enum values here)
+  final List<String> categories = [
+    'All',         // Include All option for no filter
+    'Conference',  // Replace with actual categories from your database
+    'Wedding',
+    'Parties',
+    'Corporate',
+    'Outdoor',
+    'Indoor',
+    'Sports',
+  ];
 
   @override
   void initState() {
@@ -38,6 +50,12 @@ class _VenueCatalogScreenState extends State<VenueCatalogScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Apply search and category filters
+    List<Venue> filteredVenues = venues.where((venue) {
+      return venue.name.toLowerCase().contains(searchQuery) &&
+          (selectedCategory == 'All' || venue.category == selectedCategory);
+    }).toList();
+
     return Scaffold(
       body: isLoading // Show loading indicator while fetching
           ? Center(child: CircularProgressIndicator())
@@ -72,113 +90,114 @@ class _VenueCatalogScreenState extends State<VenueCatalogScreen> {
                   ),
                   // Venue list
                   Expanded(
-                    child: ListView.builder(
-                      padding: const EdgeInsets.all(8),
-                      itemCount: venues.length,
-                      itemBuilder: (context, index) {
-                        final venue = venues[index];
-                        // Apply search and category filters
-                        if (!(venue.name.toLowerCase().contains(searchQuery) &&
-                            (selectedCategory == 'All' || venue.category == selectedCategory))) {
-                          return SizedBox.shrink(); // Return an empty box if it doesn't match
-                        }
+                    child: filteredVenues.isEmpty // Check if there are no results
+                        ? const Center(child: Text('No venues found.')) // Show no results message
+                        : ListView.builder(
+                            padding: const EdgeInsets.all(8),
+                            itemCount: filteredVenues.length,
+                            itemBuilder: (context, index) {
+                              final venue = filteredVenues[index];
 
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => VenueDetailsScreen(
-                                  name: venue.name,
-                                  location: venue.location,
-                                  images: venue.images,
-                                  pricePerHour: venue.pricePerHour,
-                                  availability: venue.availability,
-                                  category: venue.category,
-                                  additionalDetails: venue.additionalDetails,
-                                ),
-                              ),
-                            );
-                          },
-                          child: Card(
-                            elevation: 4,
-                            margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(15),
-                                    topRight: Radius.circular(15),
-                                  ),
-                                  child: CachedNetworkImage(
-                                    imageUrl: venue.images.isNotEmpty && Uri.tryParse(venue.images.first)?.hasScheme == true
-                                        ? venue.images.first
-                                        : 'https://images.squarespace-cdn.com/content/v1/60da576b8b440e12699c9263/84391c8c-f6a3-415a-988e-ff0534ace4fc/ovation+2.jpg', // Replace with your default image URL
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
-                                    height: 150,
-                                    placeholder: (context, url) =>
-                                        const Center(child: CircularProgressIndicator()), // Placeholder while loading
-                                    errorWidget: (context, url, error) =>
-                                        const Icon(Icons.error), // Error icon
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    venue.name,
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(0xFF00008B),
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => VenueDetailsScreen(
+                                        name: venue.name,
+                                        location: venue.location,
+                                        images: venue.images,
+                                        pricePerHour: venue.pricePerHour,
+                                        availability: venue.availability,
+                                        category: venue.category,
+                                        additionalDetails: venue.additionalDetails,
+                                      ),
                                     ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
-                                  child: Text(
-                                    venue.location,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
-                                  child: Text(
-                                    '₱${venue.pricePerHour.toStringAsFixed(2)} per hour',
-                                    style: const TextStyle(
-                                      fontFamily: 'Poppins',  // Ensure 'Poppins' is used
-                                      fontSize: 16,
-                                      color: Color(0xFF00008B),
-                                    ),
-                                  ),
-                                ),
-                                // Display the average rating
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
-                                  child: Row(
+                                  );
+                                },
+                                child: Card(
+                                  elevation: 4,
+                                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      const Icon(Icons.star, color: Colors.amber),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        venue.getAverageRating().toStringAsFixed(1),
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.black,
+                                      ClipRRect(
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(15),
+                                          topRight: Radius.circular(15),
+                                        ),
+                                        child: Image.file(
+                                          File(venue.images.isNotEmpty
+                                              ? venue.images.first
+                                              : 'assets/images/venuetest.jpg'),
+                                          width: double.infinity,
+                                          height: 150,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Image.asset(
+                                              'assets/images/venuetest.jpg',
+                                              width: double.infinity,
+                                              height: 150,
+                                              fit: BoxFit.cover,
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Text(
+                                          venue.name,
+                                          style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF00008B),
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
+                                        child: Text(
+                                          venue.location,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 8.0, bottom: 4.0),
+                                        child: Text(
+                                          '₱${venue.pricePerHour.toStringAsFixed(2)} per hour',
+                                          style: const TextStyle(
+                                            fontFamily: 'Poppins',  // Ensure 'Poppins' is used
+                                            fontSize: 16,
+                                            color: Color(0xFF00008B),
+                                          ),
+                                        ),
+                                      ),
+                                      // Display the average rating
+                                      Padding(
+                                        padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+                                        child: Row(
+                                          children: [
+                                            const Icon(Icons.star, color: Colors.amber),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              venue.getAverageRating().toStringAsFixed(1),
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.black,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
-                        );
-                      },
-                    ),
                   ),
                 ],
               ),
@@ -193,69 +212,31 @@ class _VenueCatalogScreenState extends State<VenueCatalogScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Filter Venues'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                title: const Text('All'),
-                leading: Radio(
-                  value: 'All',
-                  groupValue: selectedCategory,
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedCategory = value!;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-              ListTile(
-                title: const Text('Weddings'),
-                leading: Radio(
-                  value: 'Weddings',
-                  groupValue: selectedCategory,
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedCategory = value!;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-              ListTile(
-                title: const Text('Parties'),
-                leading: Radio(
-                  value: 'Parties',
-                  groupValue: selectedCategory,
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedCategory = value!;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-              ListTile(
-                title: const Text('Meetings'),
-                leading: Radio(
-                  value: 'Meetings',
-                  groupValue: selectedCategory,
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedCategory = value!;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ),
-            ],
+          content: SingleChildScrollView( // Enable scrolling if there are many categories
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: categories.map((category) {
+                return ListTile(
+                  title: Text(category),
+                  leading: Radio(
+                    value: category,
+                    groupValue: selectedCategory,
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedCategory = value!;
+                      });
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                );
+              }).toList(),
+            ),
           ),
         );
       },
     );
   }
 }
-
 
 
 

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:venue_app/models/user.dart';
 
 class UserRepository {
-  final String baseUrl = 'http://10.0.2.2/database'; // Your local server
+  final String baseUrl = 'http://192.168.0.47/database'; // Your local server
 
   // Fetch user count excluding admin users
   Future<int> fetchUserCount() async {
@@ -98,4 +98,91 @@ class UserRepository {
       throw error; // Rethrow the error after logging it
     }
   }
+
+   // Fetch submitted photos
+  Future<List<User>> fetchSubmittedUsers() async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/fetch_submitted_photos.php'));
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+        // Print the response for debugging
+        print(jsonData); // Check what you are receiving from the server
+
+        if (jsonData['success'] == true && jsonData['data'] is List) {
+          return (jsonData['data'] as List)
+              .map((userData) => User.fromJson(userData))
+              .toList();
+        } else {
+          throw Exception('Unexpected response structure: ${jsonData.toString()}');
+        }
+      } else {
+        throw Exception('Failed to fetch submitted users: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching submitted users: $e');
+    }
+  }
+
+  // Accept user application
+// Accept user application and update role to 'venue_owner'
+Future<Map<String, dynamic>> acceptUserApplication(String userId, String s) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/accept_user_application.php'),
+      body: {'user_id': userId},
+    );
+
+    final result = jsonDecode(response.body);
+    if (result['success']) {
+      // Update user role to 'venue_owner' after acceptance
+      bool roleUpdated = await updateUserRole(userId, 'venue_owner');
+      return {'success': roleUpdated};
+    } else {
+      print(result['error']);
+      return {'success': false, 'error': result['error']};
+    }
+  } catch (e) {
+    return {'success': false, 'error': e.toString()};
+  }
+}
+
+// Deny user application without changing the role
+Future<Map<String, dynamic>> denyUserApplication(String userId) async {
+  try {
+    final denyResponse = await http.post(
+      Uri.parse('$baseUrl/deny_user_submission.php'),
+      body: {'user_id': userId},
+    );
+
+    return jsonDecode(denyResponse.body);
+  } catch (e) {
+    return {'success': false, 'error': e.toString()};
+  }
+}
+
+
+// Update user role
+Future<bool> updateUserRole(String userId, String newRole) async {
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/update_user_role.php'),
+      body: {
+        'user_id': userId,
+        'user_type': newRole, // Ensure consistent naming
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+      return result['success'];
+    } else {
+      return false;
+    }
+  } catch (e) {
+    print('Error updating user role: $e');
+    return false;
+  }
+}
 }

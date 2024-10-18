@@ -4,7 +4,7 @@ import 'package:venue_app/models/venue.dart';
 
 class VenueService {
   static Future<List<Venue>> fetchAll() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2/database/fetch_venues.php'));
+    final response = await http.get(Uri.parse('http://192.168.0.47/database/fetch_venues.php'));
 
     print('Response status: ${response.statusCode}'); // Log the status code
     print('Response body: ${response.body}'); // Log the response body

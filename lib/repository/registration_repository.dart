@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class RegistrationRepository {
-  final String apiUrl = 'http://10.0.2.2/database/register_user.php'; // Replace with your API endpoint
+  final String apiUrl = 'http://192.168.0.47/database/register_user.php'; // Replace with your API endpoint
 
   Future<bool> registerUser(String fullName, String email, String password, List<String> userTypes) async {
     try {

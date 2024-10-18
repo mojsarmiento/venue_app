@@ -41,21 +41,6 @@ class _OwnerEditProfilePageState extends State<OwnerEditProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
-              CircleAvatar(
-                radius: 60,
-                backgroundImage: const AssetImage('assets/images/profile_pic.jpg'),
-                backgroundColor: Colors.transparent,
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: IconButton(
-                    icon: const Icon(Icons.camera_alt, color: Color(0xFF00008B)),
-                    onPressed: () {
-                      // Implement image picker functionality
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
               TextField(
                 controller: _nameController,
                 decoration: const InputDecoration(

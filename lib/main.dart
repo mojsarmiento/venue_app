@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:venue_app/bloc/request_bloc.dart';
+import 'package:venue_app/bloc/booking_bloc.dart';
 import 'package:venue_app/repository/request_repository.dart';
 import 'package:venue_app/repository/venue_repository.dart';
-import 'package:venue_app/repository/user_repository.dart'; // Import UserRepository
+import 'package:venue_app/repository/user_repository.dart';
+import 'package:venue_app/repository/booking_repository.dart';
 import 'package:venue_app/splashscreen.dart';
 import 'package:google_fonts/google_fonts.dart'; 
-import 'package:flutter_bloc/flutter_bloc.dart'; // Import Bloc
-import 'package:venue_app/bloc/venue_bloc.dart'; // Import VenueBloc
-import 'package:venue_app/bloc/user_bloc.dart'; // Import UserBloc
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:venue_app/bloc/venue_bloc.dart';
+import 'package:venue_app/bloc/user_bloc.dart';
+import 'package:flutter_stripe/flutter_stripe.dart'; // Import Stripe package
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Set your Stripe publishable key (you can find it in your Stripe Dashboard)
+  Stripe.publishableKey = 'pk_test_51Og4l4HmrYAdyFeAFkl5FXT66xD9KIIRTWfSLYLOKqeYyUb7XwyLowbBR5Bo6BGZQrgk2ERqbZZDPoE0C0jYeoi800HmNA5K6V'; // Replace with your actual Stripe Publishable Key
+
+  // Optionally, set the Apple and Google Pay configurations if needed (for mobile apps)
+  // Stripe.merchantIdentifier = 'your_merchant_id'; // For Apple Pay
+  // Stripe.urlScheme = 'your_app_url_scheme'; // For mobile apps deep linking (optional)
+
   runApp(const MyApp());
 }
 
@@ -18,16 +30,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider( // Use MultiBlocProvider to provide multiple blocs
+    return MultiBlocProvider(
       providers: [
         BlocProvider(
           create: (context) => VenueBloc(venueRepository: VenueRepository()),
         ),
         BlocProvider(
-          create: (context) => UserBloc(userRepository: UserRepository()), // Provide UserBloc
+          create: (context) => UserBloc(userRepository: UserRepository()),
         ),
         BlocProvider(
-          create: (context) => RequestBloc(requestRepository: RequestRepository())
+          create: (context) => RequestBloc(requestRepository: RequestRepository()),
+        ),
+        BlocProvider(
+          create: (context) => BookingBloc(bookingRepository: BookingRepository()),
         ),
       ],
       child: MaterialApp(
@@ -38,9 +53,8 @@ class MyApp extends StatelessWidget {
           textTheme: GoogleFonts.poppinsTextTheme(),
           useMaterial3: true,
         ),
-        home: const SplashScreen(), // Use SplashScreen as before
+        home: const SplashScreen(),
       ),
     );
   }
 }
-

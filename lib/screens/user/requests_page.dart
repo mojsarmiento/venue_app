@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart'; // Import the intl package
 import 'package:venue_app/bloc/request_bloc.dart'; // Ensure correct import
 import 'package:venue_app/bloc/request_event.dart';
 import 'package:venue_app/bloc/request_state.dart';
@@ -166,7 +167,7 @@ class _RequestsPageState extends State<RequestsPage> {
             context,
             MaterialPageRoute(
               builder: (context) => RequestVisitDetailsScreen(
-                requestVisitDetails: request.toJson(),
+                requestVisitDetails: request.toJson(), venueImages:const [],
               ),
             ),
           );
@@ -216,8 +217,9 @@ class _RequestsPageState extends State<RequestsPage> {
                             color: Colors.grey,
                           ),
                         ),
+                        // Format the time to display in AM/PM
                         Text(
-                          'Time: ${request.requestTime}',
+                          'Time: ${_formatTime(request.requestTime)}', 
                           style: const TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                       ],
@@ -259,9 +261,23 @@ class _RequestsPageState extends State<RequestsPage> {
       case 'approved':
         return Colors.green; // Green for approved
       case 'rejected':
-        return Colors.red; // Red for rejected
+        return Colors.red; 
+      case 'done':
+        return Colors.blue;// Red for rejected
       default:
-        return Colors.blue; // Default color
+        return Colors.grey; // Default color
+    }
+  }
+
+  // Method to format time to AM/PM
+  String _formatTime(String time) {
+    try {
+      final DateFormat inputFormat = DateFormat("HH:mm"); // Input format of the time
+      final DateFormat outputFormat = DateFormat("h:mm a"); // Output format (AM/PM)
+      final DateTime dateTime = inputFormat.parse(time);
+      return outputFormat.format(dateTime);
+    } catch (e) {
+      return time; // Return original if formatting fails
     }
   }
 }

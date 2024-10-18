@@ -17,7 +17,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2/database/register_user.php'), // Update the URL as needed
+        Uri.parse('http://192.168.0.47/database/register_user.php'), // Update the URL as needed
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'full_name': event.fullName,

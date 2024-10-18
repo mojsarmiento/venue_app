@@ -82,8 +82,8 @@ class ManageUsersPage extends StatelessWidget {
                             _showEditDialog(context, user);
                           } else if (value == 'delete') {
                             _confirmDeleteUser(context, user.userId); // Confirm before deletion
-                          } else if (value == 'details') {
-                            // Implement view details functionality
+                          } else if (value == 'view') {
+                            _showViewDialog(context, user); // Show user details in a dialog
                           }
                         },
                         itemBuilder: (context) => [
@@ -94,6 +94,10 @@ class ManageUsersPage extends StatelessWidget {
                           const PopupMenuItem(
                             value: 'delete',
                             child: Text('Delete'),
+                          ),
+                          const PopupMenuItem(
+                            value: 'view',
+                            child: Text('View'),
                           ),
                         ],
                         icon: const Icon(Icons.more_vert),
@@ -147,7 +151,7 @@ class ManageUsersPage extends StatelessWidget {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Edit User'),
+          title: const Text('Edit User', style: TextStyle(color: Color(0xFF00008B)),),
           content: Form(
             key: formKey,
             child: Column(
@@ -209,5 +213,66 @@ class ManageUsersPage extends StatelessWidget {
       },
     );
   }
+
+  void _showViewDialog(BuildContext context, User user) {
+  showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text(
+          'User Details',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: Color(0xFF00008B)
+          ),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDetailRow('Full Name:', user.fullName),
+            const SizedBox(height: 8), // Add spacing between rows
+            _buildDetailRow('Email:', user.email),
+            const SizedBox(height: 8),
+            _buildDetailRow('User Type:', user.userType),
+            const SizedBox(height: 8),
+            _buildDetailRow('User ID:', user.userId),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+            child: const Text('Close'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+Widget _buildDetailRow(String label, String value) {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        '$label ',
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: Color(0xFF00008B),
+        ),
+      ),
+      Expanded(
+        child: Text(
+          value,
+          style: const TextStyle(color: Colors.black87),
+        ),
+      ),
+    ],
+  );
+}
+
 }
 

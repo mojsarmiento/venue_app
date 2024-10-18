@@ -21,7 +21,7 @@ class _AdminChangePasswordPageState extends State<AdminChangePasswordPage> {
     final String newPassword = _newPasswordController.text;
 
     // Replace this URL with your actual change password endpoint
-    const String url = 'http://10.0.2.2/database/change_password.php'; 
+    const String url = 'http://192.168.0.47/database/change_password.php'; 
 
     final response = await http.post(
       Uri.parse(url),

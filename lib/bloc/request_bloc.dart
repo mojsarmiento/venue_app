@@ -1,6 +1,5 @@
 // request_bloc.dart
 import 'dart:convert';
-import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:venue_app/repository/request_repository.dart';
 import 'request_event.dart';
@@ -25,7 +24,7 @@ class RequestBloc extends Bloc<RequestEvent, RequestState> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2/database/request.php'),
+        Uri.parse('http://192.168.0.47/database/request.php'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           'venue_name': event.venue,

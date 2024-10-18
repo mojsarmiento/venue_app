@@ -1,53 +1,68 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'dart:io'; // Import the dart:io library
+import 'package:intl/intl.dart'; // Import the intl package
 
 class RequestVisitDetailsScreen extends StatelessWidget {
-   final Map<String, dynamic> requestVisitDetails; // Update type here
+  final Map<String, dynamic> requestVisitDetails; // Updated type here
+  final List<File> venueImages; // Change to List<File>
 
-  const RequestVisitDetailsScreen({super.key, required this.requestVisitDetails});
+  const RequestVisitDetailsScreen({
+    super.key,
+    required this.requestVisitDetails,
+    required this.venueImages, // Add this to the constructor
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Placeholder images for carousel
-    final List<String> placeholderImages = [
-      'assets/images/venuetest.jpg',
-      'assets/images/venuetest.jpg',
-      'assets/images/venuetest.jpg',
-    ];
-
-    // Extract the status from the requestVisitDetails map with null safety
     final String status = requestVisitDetails['status'] ?? 'Unknown';
 
-    // Determine the status color, text, and icon
+    // Determine the status color, text, icon, and message
     Color statusColor;
     String statusText;
     Icon statusIcon;
+    String statusMessage;
 
     switch (status) {
       case 'Approved':
         statusColor = Colors.green;
         statusText = 'Approved';
         statusIcon = const Icon(Icons.check_circle, color: Colors.green);
+        statusMessage = 'Please arrive on time for your visit.'; // Message for approved
         break;
       case 'Pending':
         statusColor = Colors.orange;
         statusText = 'Pending';
         statusIcon = const Icon(Icons.access_time, color: Colors.orange);
+        statusMessage = 'Please wait for approval.'; // Message for pending
         break;
       case 'Rejected':
         statusColor = Colors.red;
         statusText = 'Rejected';
         statusIcon = const Icon(Icons.cancel, color: Colors.red);
+        statusMessage = 'Your request was rejected due to unavailability or other reasons.'; // Message for rejected
         break;
       case 'Done':
         statusColor = Colors.blue;
         statusText = 'Done';
         statusIcon = const Icon(Icons.check_circle, color: Colors.blue);
+        statusMessage = 'Thank you for visiting!'; // Message for done status
         break;
       default:
         statusColor = Colors.grey;
         statusText = 'Unknown';
         statusIcon = const Icon(Icons.help, color: Colors.grey);
+        statusMessage = 'Status is unknown. Please contact support.'; // Message for unknown status
+    }
+
+    // Formatting the time
+    String formatTime(String time) {
+      try {
+        DateTime dateTime = DateFormat("HH:mm").parse(time); // Adjust the format if necessary
+        return DateFormat.jm().format(dateTime); // Format to AM/PM
+      } catch (e) {
+        return time; // Return original time if parsing fails
+      }
     }
 
     return Scaffold(
@@ -88,6 +103,7 @@ class RequestVisitDetailsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // CarouselSlider for local images
                   Container(
                     padding: const EdgeInsets.all(16.0),
                     child: CarouselSlider(
@@ -98,7 +114,7 @@ class RequestVisitDetailsScreen extends StatelessWidget {
                         enlargeCenterPage: true,
                         scrollDirection: Axis.horizontal,
                       ),
-                      items: placeholderImages.map((imagePath) {
+                      items: venueImages.map((file) { // Iterate over the list of File objects
                         return Builder(
                           builder: (BuildContext context) {
                             return Container(
@@ -106,8 +122,8 @@ class RequestVisitDetailsScreen extends StatelessWidget {
                               margin: const EdgeInsets.symmetric(horizontal: 5.0),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child: Image.asset(
-                                  imagePath,
+                                child: Image.file(
+                                  file, // Use Image.file to display the local file
                                   fit: BoxFit.cover,
                                   errorBuilder: (context, error, stackTrace) {
                                     return const Center(
@@ -119,9 +135,10 @@ class RequestVisitDetailsScreen extends StatelessWidget {
                             );
                           },
                         );
-                      }).toList(),
+                      }).toList(), // Convert the map to a list
                     ),
                   ),
+
                   const SizedBox(height: 16),
 
                   // Venue Name with null safety check
@@ -155,9 +172,9 @@ class RequestVisitDetailsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // Visit Time with null safety check
+                  // Visit Time with null safety check and AM/PM formatting
                   Text(
-                    'Time: ${requestVisitDetails['request_time'] ?? 'Unknown Time'}',
+                    'Time: ${formatTime(requestVisitDetails['request_time'] ?? 'Unknown Time')}',
                     style: const TextStyle(
                       fontSize: 18,
                       color: Colors.black87,
@@ -180,6 +197,16 @@ class RequestVisitDetailsScreen extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const SizedBox(height: 8),
+
+                  // Status Message Section
+                  Text(
+                    statusMessage,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black54,
+                    ),
+                  ),
                   const SizedBox(height: 16),
                 ],
               ),
@@ -190,8 +217,5 @@ class RequestVisitDetailsScreen extends StatelessWidget {
     );
   }
 }
-
-
-
 
 

@@ -69,6 +69,27 @@ class _RequestVisitFormScreenState extends State<RequestVisitFormScreen> {
         _selectedDate != null &&
         _selectedTime != null) {
       
+      // Combine selected date and time into one DateTime object
+      final now = DateTime.now();
+      final selectedDateTime = DateTime(
+        _selectedDate!.year,
+        _selectedDate!.month,
+        _selectedDate!.day,
+        _selectedTime!.hour,
+        _selectedTime!.minute,
+      );
+
+      // Check if the selected date and time are before the current date and time
+      if (selectedDateTime.isBefore(now)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a future date and time.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return; // Stop the function here
+      }
+
       String formattedDate = DateFormat('yyyy-MM-dd').format(_selectedDate!);
       String formattedTime = DateFormat('HH:mm:ss').format(DateTime(
         0,

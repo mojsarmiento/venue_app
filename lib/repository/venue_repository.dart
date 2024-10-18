@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:venue_app/models/venue.dart';
 
 class VenueRepository {
-  final String baseUrl = 'http://10.0.2.2/database'; // Change to your XAMPP server path
+  final String baseUrl = 'http://192.168.0.47/database'; // Change to your XAMPP server path
 
   Future<void> addVenue(Venue venue) async {
     final url = Uri.parse('$baseUrl/add_venue.php'); // Backend API to handle adding a venue

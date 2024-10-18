@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:venue_app/screens/login.dart';  
 import 'package:venue_app/screens/user/change_password.dart';
-import 'package:venue_app/screens/user/home.dart';
 import 'package:venue_app/screens/venue_owner/owner_edit_profile.dart';
 
 class VenueOwnerProfilePage extends StatefulWidget {
@@ -138,14 +137,6 @@ class _VenueOwnerProfilePageState extends State<VenueOwnerProfilePage> {
               trailing: const Icon(Icons.arrow_forward_ios),
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) => const ChangePasswordPage()));
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.business, color: Color(0xFF00008B)),
-              title: const Text('Be a Reserver'),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
               },
             ),
             ListTile(

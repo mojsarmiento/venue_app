@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:venue_app/models/booking.dart';
 import 'package:venue_app/models/request.dart';
 
 class RequestCard extends StatelessWidget {
@@ -17,11 +19,20 @@ class RequestCard extends StatelessWidget {
     required this.onMarkAsDone,
   });
 
+  String formatTime(String time) {
+    // Parse the time string and format it to display AM/PM
+    try {
+      final DateTime parsedTime = DateFormat("HH:mm").parse(time);
+      return DateFormat("hh:mm a").format(parsedTime); // Convert to AM/PM format
+    } catch (e) {
+      return time; // If parsing fails, return the original time string
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 6,
-      color: const Color.fromARGB(255, 220, 210, 255),
       margin: const EdgeInsets.symmetric(vertical: 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
@@ -80,7 +91,7 @@ class RequestCard extends StatelessWidget {
             Text('Venue: ${request.venueName}', style: const TextStyle(fontSize: 16)),
             Text('Location: ${request.location}', style: const TextStyle(fontSize: 16)),
             Text('Request Date: ${request.requestDate}', style: const TextStyle(fontSize: 16)),
-            Text('Request Time: ${request.requestTime}', style: const TextStyle(fontSize: 16)),
+            Text('Request Time: ${formatTime(request.requestTime)}', style: const TextStyle(fontSize: 16)),
             const SizedBox(height: 16),
             // Buttons
             Row(
@@ -136,6 +147,151 @@ class RequestCard extends StatelessWidget {
   }
 }
 
+class BookingCard extends StatelessWidget {
+  final Booking booking;
+  final VoidCallback onApprove;
+  final VoidCallback onReject;
+  final VoidCallback onMarkAsDoneBook;
+
+  const BookingCard({
+    super.key,
+    required this.booking,
+    required this.onApprove,
+    required this.onReject,
+    required this.onMarkAsDoneBook,
+  });
+
+  String formatTime(String time) {
+    // Parse the time string and format it to display AM/PM
+    try {
+      final DateTime parsedTime = DateFormat("HH:mm").parse(time);
+      return DateFormat("hh:mm a").format(parsedTime); // Convert to AM/PM format
+    } catch (e) {
+      return time; // If parsing fails, return the original time string
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 6,
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Text(
+                  booking.fullName,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF00008B),
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: booking.status == 'Approved'
+                        ? Colors.green[100]
+                        : booking.status == 'Rejected'
+                            ? Colors.red[100]
+                            : booking.status == 'Done'
+                                ? Colors.blue[100]
+                                : Colors.orange[100],
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    booking.status,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: booking.status == 'Approved'
+                          ? Colors.green
+                          : booking.status == 'Rejected'
+                              ? Colors.red
+                              : booking.status == 'Done'
+                                  ? Colors.blue
+                                  : Colors.orange,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text('Email: ${booking.email}', style: const TextStyle(fontSize: 16)),
+            Text('Mobile: ${booking.phoneNumber}', style: const TextStyle(fontSize: 16)),
+            Text('Venue: ${booking.venueName}', style: const TextStyle(fontSize: 16)),
+            Text('Location: ${booking.location}', style: const TextStyle(fontSize: 16)),
+            Text('Request Date: ${booking.date}', style: const TextStyle(fontSize: 16)),
+            Text('Request Time: ${formatTime(booking.time)}', style: const TextStyle(fontSize: 16)),
+            Text('Hours: ${booking.hours}', style: const TextStyle(fontSize: 16)),
+            Text('Total Price: ${booking.totalPrice}', style: const TextStyle(fontSize: 16)),
+            Text('Downpayment: ${booking.downpayment}', style: const TextStyle(fontSize: 16)),
+            const SizedBox(height: 16),
+            // Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Flexible( // Allow buttons to shrink if needed
+                  child: ElevatedButton(
+                    onPressed: onApprove,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text(
+                      'Approve',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Flexible( // Allow buttons to shrink if needed
+                  child: ElevatedButton(
+                    onPressed: onReject,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text(
+                      'Reject',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Flexible( // Allow buttons to shrink if needed
+                  child: ElevatedButton(
+                    onPressed: onMarkAsDoneBook,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    child: const Text(
+                      'Mark as Done',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 
 // BookingsPage widget
 class AdminBookingsPage extends StatefulWidget {
@@ -147,16 +303,18 @@ class AdminBookingsPage extends StatefulWidget {
 
 class _AdminBookingsPageState extends State<AdminBookingsPage> {
   List<Request> requests = [];
-  String _selectedOption = 'Requests'; // Default selected option
+  List<Booking> bookings = [];
+  String _selectedOption = 'Bookings'; // Default selected option
 
   @override
   void initState() {
     super.initState();
-    fetchRequests(); // Fetch requests when the widget is initialized
+    fetchRequests(); 
+    fetchBookings();// Fetch requests when the widget is initialized
   }
 
   Future<void> fetchRequests() async {
-    final response = await http.get(Uri.parse('http://10.0.2.2/database/fetch_requests.php'));
+    final response = await http.get(Uri.parse('http://192.168.0.47/database/fetch_requests.php'));
 
     if (response.statusCode == 200) {
       // Parse response as a List
@@ -184,7 +342,7 @@ class _AdminBookingsPageState extends State<AdminBookingsPage> {
 
   Future<void> markAsDone(String requestId) async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2/database/mark_as_done.php'),
+      Uri.parse('http://192.168.0.47/database/mark_as_done.php'),
       body: json.encode({'id': requestId}),
       headers: {'Content-Type': 'application/json'},
     );
@@ -199,7 +357,7 @@ class _AdminBookingsPageState extends State<AdminBookingsPage> {
 
   Future<void> approveRequest(String requestId) async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2/database/approve_request.php'),
+      Uri.parse('http://192.168.0.47/database/approve_request.php'),
       body: json.encode({'id': requestId}),
       headers: {'Content-Type': 'application/json'},
     );
@@ -213,7 +371,7 @@ class _AdminBookingsPageState extends State<AdminBookingsPage> {
 
   Future<void> rejectRequest(String requestId) async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2/database/reject_request.php'),
+      Uri.parse('http://192.168.0.47/database/reject_request.php'),
       body: json.encode({'id': requestId}),
       headers: {'Content-Type': 'application/json'},
     );
@@ -306,9 +464,163 @@ class _AdminBookingsPageState extends State<AdminBookingsPage> {
     }
   }
 
+Future<void> fetchBookings() async {
+  final response = await http.get(Uri.parse('http://192.168.0.47/database/fetch_booking.php'));
+
+  if (response.statusCode == 200) {
+    // Parse response as a List
+    List<dynamic> jsonData = json.decode(response.body);
+
+    setState(() {
+      bookings = jsonData.map<Booking>((item) {
+        return Booking(
+          id: item['id'] ?? 0, // Parse id as int
+          fullName: item['full_name'] ?? '',
+          email: item['email'] ?? '',
+          phoneNumber: item['phone_number'] ?? '',
+          venueName: item['venue_name'] ?? '',
+          location: item['location'] ?? '',
+          date: item['date'] ?? '',
+          time: item['time'] ?? '',
+          hours: item['hours']??'',
+          totalPrice: double.tryParse(item['total_price'].toString()) ?? 0.0, // Parse totalPrice as double
+          downpayment: double.tryParse(item['downpayment'].toString()) ?? 0.0, // Parse downpayment as double
+          status: item['status'] ?? 'Pending',
+        );
+      }).toList(); // Map each item to a Booking object
+    });
+  } else {
+    throw Exception('Failed to load Bookings');
+  }
+}
+  Future<void> markAsDoneBooking(String requestId) async {
+    final response = await http.post(
+      Uri.parse('http://192.168.0.47/database/booking_done.php'),
+      body: json.encode({'id': requestId}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      fetchBookings();
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Marked as Done.')));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to mark as done.')));
+    }
+  }
+
+  Future<void> approveBooking(String requestId) async {
+    final response = await http.post(
+      Uri.parse('http://192.168.0.47/database/booking_approve.php'),
+      body: json.encode({'id': requestId}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      fetchBookings();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to approve Booking.')));
+    }
+  }
+
+  Future<void> rejectBooking(String requestId) async {
+    final response = await http.post(
+      Uri.parse('http://192.168.0.47/database/booking_reject.php'),
+      body: json.encode({'id': requestId}),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    if (response.statusCode == 200) {
+      fetchBookings();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Failed to reject Booking.')));
+    }
+  }
+
+  Future<void> showApproveDialogBook(Booking request) async {
+    bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Approve Booking'),
+          content: const Text('Are you sure you want to approve this Booking?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // Return false when canceled
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // Return true when approved
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      approveBooking(request.id.toString());
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Booking approved.')));
+    }
+  }
+
+  Future<void> showRejectDialogBook(Booking request) async {
+    bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Reject Booking'),
+          content: const Text('Are you sure you want to reject this Booking?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // Return false when canceled
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // Return true when rejected
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      rejectBooking(request.id.toString());
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Booking rejected.')));
+    }
+  }
+
+  Future<void> showMarkAsDoneDialogBook(Booking request) async {
+    bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Mark as Done'),
+          content: const Text('Are you sure you want to mark this Book as done?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // Return false when canceled
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // Return true when marked as done
+              child: const Text('Yes'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      markAsDoneBooking(request.id.toString());
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Booking marked as done.')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: const Text(
           'Bookings / Requests',
@@ -370,10 +682,25 @@ class _AdminBookingsPageState extends State<AdminBookingsPage> {
 
   // Dummy function for bookings list
   Widget _buildBookingsList() {
-    return const Center(child: Text('No bookings available.')); // Replace with actual bookings list
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ListView.builder(
+        itemCount: bookings.length,
+        itemBuilder: (context, index) {
+          return BookingCard(
+            booking: bookings[index],
+            onApprove: () {
+              showApproveDialogBook(bookings[index]);
+            },
+            onReject: () {
+              showRejectDialogBook(bookings[index]);
+            },
+            onMarkAsDoneBook: () {
+              showMarkAsDoneDialogBook(bookings[index]);
+            }
+          );
+        },
+      ),
+    );
   }
-  
 }
-
-
-

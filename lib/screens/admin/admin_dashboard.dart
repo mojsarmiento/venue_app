@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:venue_app/bloc/booking_bloc.dart'; // Import BookingBloc
+import 'package:venue_app/bloc/booking_event.dart'; // Import BookingEvent
+import 'package:venue_app/bloc/booking_state.dart'; // Import BookingState
 import 'package:venue_app/bloc/request_bloc.dart';
 import 'package:venue_app/bloc/request_event.dart';
 import 'package:venue_app/bloc/request_state.dart';
@@ -9,6 +12,7 @@ import 'package:venue_app/bloc/user_state.dart';
 import 'package:venue_app/bloc/venue_bloc.dart';
 import 'package:venue_app/bloc/venue_event.dart';
 import 'package:venue_app/bloc/venue_state.dart';
+import 'package:venue_app/repository/booking_repository.dart';
 import 'package:venue_app/repository/request_repository.dart';
 import 'package:venue_app/repository/user_repository.dart';
 import 'package:venue_app/repository/venue_repository.dart';
@@ -29,6 +33,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
     super.didChangeDependencies();
     // Fetch the user count when the widget is built
     BlocProvider.of<UserBloc>(context).add(FetchUserCountEvent());
+    BlocProvider.of<BookingBloc>(context).add(FetchBookings()); // Fetch total bookings
   }
 
   @override
@@ -39,21 +44,28 @@ class _AdminDashboardState extends State<AdminDashboard> {
           create: (context) {
             final venueRepository = VenueRepository();
             return VenueBloc(venueRepository: venueRepository)
-              ..add(FetchTotalVenues()); // Fetch total venues on initialization
+              ..add(FetchTotalVenues());
           },
         ),
         BlocProvider(
           create: (context) {
-            final userRepository = UserRepository(); // Initialize your user repository
+            final userRepository = UserRepository();
             return UserBloc(userRepository: userRepository)
-              ..add(FetchUserCountEvent()); // Fetch user count on initialization
+              ..add(FetchUserCountEvent());
           },
         ),
         BlocProvider(
           create: (context) {
-            final requestRepository = RequestRepository(); // Initialize your request repository
+            final requestRepository = RequestRepository();
             return RequestBloc(requestRepository: requestRepository)
-              ..add(FetchTotalRequest()); // Fetch total requests on initialization
+              ..add(FetchTotalRequest());
+          },
+        ),
+        BlocProvider(
+          create: (context) {
+            final bookingRepository = BookingRepository(); // Initialize booking repository
+            return BookingBloc(bookingRepository: bookingRepository)
+              ..add(FetchBookings()); // Fetch total bookings on initialization
           },
         ),
       ],
@@ -76,45 +88,49 @@ class _AdminDashboardState extends State<AdminDashboard> {
                 const SizedBox(height: 16),
 
                 // Total Bookings
-                BlocBuilder<VenueBloc, VenueState>(builder: (context, state) {
-                  if (state is VenueLoading) {
+                BlocBuilder<BookingBloc, BookingState>(builder: (context, state) {
+                  if (state is BookingLoading) {
                     return const Center(child: CircularProgressIndicator());
-                  } else if (state is VenueTotalLoaded) {
+                  } else if (state is BookingLoaded) {
                     return _buildStatCard(
                       context,
                       icon: Icons.book_online,
                       title: 'Total Bookings',
-                      value: '15', // Replace with actual bookings count from your state
+                      value: state.totalBookings.toString(), // Display total bookings
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const AdminBookingsPage(),
+                        ));
+                      },
                     );
-                  } else if (state is VenueError) {
-                    return Center(child: Text(state.message));
+                  } else if (state is BookingError) {
+                    return Center(child: Text(state.error));
                   }
                   return Container();
                 }),
                 const SizedBox(height: 16),
 
-                BlocBuilder<RequestBloc, RequestState>(
-                          builder: (context, state) {
-                            if (state is RequestLoading) {
-                              return const Center(child: CircularProgressIndicator());
-                            } else if (state is RequestTotalLoaded) {
-                              return _buildStatCard(
-                                context,
-                                icon: Icons.message,
-                                title: 'Total Request Visits',
-                                value: state.totalRequest.toString(), 
-                                onTap: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => const AdminBookingsPage(),
-                                ));
-                              },// Display total requests
-                              );
-                            } else if (state is RequestError) {
-                              return Center(child: Text(state.message));
-                            }
-                            return Container(); // Return empty container if in initial state
-                          },
-                        ),
+                // Total Request Visits
+                BlocBuilder<RequestBloc, RequestState>(builder: (context, state) {
+                  if (state is RequestLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is RequestTotalLoaded) {
+                    return _buildStatCard(
+                      context,
+                      icon: Icons.message,
+                      title: 'Total Request Visits',
+                      value: state.totalRequest.toString(), 
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const AdminBookingsPage(),
+                        ));
+                      },
+                    );
+                  } else if (state is RequestError) {
+                    return Center(child: Text(state.message));
+                  }
+                  return Container();
+                }),
                 const SizedBox(height: 16),
 
                 // Total Earnings
@@ -208,4 +224,3 @@ class _AdminDashboardState extends State<AdminDashboard> {
     );
   }
 }
-
